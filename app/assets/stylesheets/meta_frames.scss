@@ -1,0 +1,116 @@
+// Place all the styles related to the meta_frames controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+ul.share_buttons{
+  margin: 1em 0;
+  padding: 0;
+  display: table;
+  li{
+    .twitter-share-button{
+      img{
+        width: 41px;
+      }
+    }
+    display: table-cell;
+    text-align: center;
+    padding-right: 1.5em;
+    vertical-align: middle;
+  }
+}
+
+// page_nationのアクティブリンクがpopupの際に浮き出るので対策
+.page-link{
+  position: static;
+}
+
+.example_words{
+  margin-top: 8px;
+  background: #f2f2f2;
+  padding: 10px 4px 2px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+
+  .title{
+    font-weight: bold;
+    font-size: 93%;
+    margin-bottom: 5px;
+  }
+  ul.words{
+    margin-bottom: 0px;
+    li{
+      a.word{
+        padding: 0 6px;
+        box-sizing: border-box;
+        float: left;
+        border: #ccc solid 1px;
+        border-radius: 4px;
+        height: 26px;
+        font-size: 93%;
+        line-height: 26px;
+        background-color: #fff;
+        margin-top: 2px;
+        color: #666;
+        overflow: hidden;
+      }
+    }
+  }
+}
+
+#pagenation_bottom{
+  margin-top: 50px;
+}
+
+.jsgif{
+  margin-top: 10px;
+  canvas{
+    width: 100%;
+  }
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  background-color: rgba(0,0,0, 0.5);
+
+  .popup_inner {
+    text-align: center;
+    margin-top: 200px;
+
+    img{
+      max-width: 100%;
+    }
+  }
+}
+
+img.img-fluid {
+  cursor: zoom-in;
+}
+
+ul.type_choice {
+  list-style: none;
+  a {
+    padding: 3px 20px;
+  }
+}
+
+.meta-frame{
+  padding: 0.5em 1em;
+
+  img.anime {
+    padding-bottom: 5px;
+  }
+
+  img.twitter-icon{
+    width: 40px;
+    margin-right: 10px;
+  }
+
+  .box{
+    background: white;
+    padding: 5px;
+  }
+}

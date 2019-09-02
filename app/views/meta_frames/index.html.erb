@@ -1,0 +1,36 @@
+<div class="container">
+  <div class="example_words">
+    <p class="title">例から検索</p>
+    <ul class="list-inline words">
+      <% @example_words.each do |word| %>
+        <li class="list-inline-item">
+          <%= link_to word, { controller: 'meta_frames', action: 'index', words: word },{ class: 'word' } %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+  <div class="row" id="pagenation_top">
+    <div class="mx-auto pagenations">
+      <%= paginate @meta_frames %>
+    </div>
+  </div>
+
+  <% if @search_form && @search_form.errors.any? %>
+    <div id="error_explanation">
+      <ul>
+        <% @search_form.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= react_component('index/MetaFrames', { meta_frames: @view_meta_frames }) %>
+
+  <div class="row" id="pagenation_bottom">
+    <div class="mx-auto pagenations">
+        <%= paginate @meta_frames %>
+    </div>
+  </div>
+</div>

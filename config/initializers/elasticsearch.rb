@@ -1,0 +1,1 @@
+Elasticsearch::Model.client = Elasticsearch::Client.new(host: Settings.elasticsearch.host, port:Settings.elasticsearch.port, logs: !Rails.env.test?, trace: !Rails.env.test?)

@@ -1,0 +1,243 @@
+- name: create ffmpeg_source directory
+  file:
+    path: /root/ffmpeg_sources
+    state: directory
+- name: install yum etc...
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - autoconf
+    - automake
+    - bzip2
+    - cmake
+    - freetype-devel
+    - gcc
+    - gcc-c++
+    - git
+    - libtool
+    - make
+    - mercurial
+    - pkgconfig
+    - zlib-devel
+
+- name: Is nasm Installed?
+  shell: nasm
+  failed_when: false
+  register: result
+  changed_when: '"command not found" in result.stdout'
+- name: NASM download
+  get_url:
+    url: http://www.nasm.us/pub/nasm/releasebuilds/2.13.02/nasm-2.13.02.tar.bz2
+    dest: /root/ffmpeg_sources
+  when: result.changed
+- name: Extract NASM
+  unarchive:
+    src: /root/ffmpeg_sources/nasm-2.13.02.tar.bz2
+    dest: /root/ffmpeg_sources
+  when: result.changed
+- shell: sh /root/ffmpeg_sources/nasm-2.13.02/autogen.sh
+  args:
+    chdir: /root/ffmpeg_sources/nasm-2.13.02
+  when: result.changed
+- shell: /root/ffmpeg_sources/nasm-2.13.02/configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin"
+  args:
+    chdir: /root/ffmpeg_sources/nasm-2.13.02
+  when: result.changed
+- make:
+    chdir: /root/ffmpeg_sources/nasm-2.13.02
+  when: result.changed
+- make:
+    chdir: /root/ffmpeg_sources/nasm-2.13.02
+    target: install
+  when: result.changed
+
+- name: install yasm
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    yasm
+# makeでこけるので諦める
+#- name: Yasm download
+#  get_url:
+#    url: http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+#    dest: /root/ffmpeg_sources
+#- unarchive:
+#    src: /root/ffmpeg_sources/yasm-1.3.0.tar.gz
+#    dest: /root/ffmpeg_sources
+#- shell: /root/ffmpeg_sources/nasm-2.13.02/configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin"
+#  args:
+#    chdir: /root/ffmpeg_sources/yasm-1.3.0
+#- make:
+#    chdir: /root/ffmpeg_sources/yasm-1.3.0
+#- make:
+#    chdir: /root/ffmpeg_sources/yasm-1.3.0
+#    target: install
+
+- name: Is x264 Installed?
+  shell: x264
+  failed_when: false
+  register: result
+  changed_when: '"command not found" in result.stdout'
+- name: libx264 download
+  git:
+    repo: http://git.videolan.org/git/x264
+    depth: 1
+    dest: /root/ffmpeg_sources/x264
+  when: result.changed
+- shell: PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" --enable-static
+  args:
+    chdir: /root/ffmpeg_sources/x264
+  when: result.changed
+- make:
+    chdir: /root/ffmpeg_sources/x264
+  when: result.changed
+- make:
+    chdir: /root/ffmpeg_sources/x264
+    target: install
+  when: result.changed
+
+# makeでresponseが返ってこないので諦める
+#- name: libx265 download
+#  hg:
+#    repo: https://bitbucket.org/multicoreware/x265
+#    dest: /root/ffmpeg_sources/x265
+#- shell: cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$HOME/ffmpeg_build" -DENABLE_SHARED:bool=off ../../source
+#  args:
+#    chdir: /root/ffmpeg_sources/x265/build/linux
+#- make:
+#    chdir: /root/ffmpeg_sources/x265/build/linux
+#- make:
+#    chdir: /root/ffmpeg_sources/x265/build/linux
+#    target: install
+
+- name: libfdk_aac download
+  git:
+    repo: https://github.com/mstorsjo/fdk-aac
+    depth: 1
+    dest: /root/ffmpeg_sources/fdk-aac
+- shell: autoreconf -fiv
+  args:
+    chdir: /root/ffmpeg_sources/fdk-aac
+- shell: ./configure --prefix="$HOME/ffmpeg_build" --disable-shared
+  args:
+    chdir: /root/ffmpeg_sources/fdk-aac
+- make:
+    chdir: /root/ffmpeg_sources/fdk-aac
+- make:
+    chdir: /root/ffmpeg_sources/fdk-aac
+    target: install
+
+- name: libmp3lame download
+  get_url:
+    url: http://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+    dest: /root/ffmpeg_sources
+- unarchive:
+    src: /root/ffmpeg_sources/lame-3.100.tar.gz
+    dest: /root/ffmpeg_sources
+- shell: ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" --disable-shared --enable-nasm
+  args:
+    chdir: /root/ffmpeg_sources/lame-3.100
+- make:
+    chdir: /root/ffmpeg_sources/lame-3.100
+- make:
+    chdir: /root/ffmpeg_sources/lame-3.100
+    target: install
+
+- name: libopus download
+  get_url:
+    url: https://archive.mozilla.org/pub/opus/opus-1.2.1.tar.gz
+    dest: /root/ffmpeg_sources
+- unarchive:
+    src: /root/ffmpeg_sources/opus-1.2.1.tar.gz
+    dest: /root/ffmpeg_sources
+- shell: ./configure --prefix="$HOME/ffmpeg_build" --disable-shared
+  args:
+    chdir: /root/ffmpeg_sources/opus-1.2.1
+- make:
+    chdir: /root/ffmpeg_sources/opus-1.2.1
+- make:
+    chdir: /root/ffmpeg_sources/opus-1.2.1
+    target: install
+
+- name: libogg download
+  get_url:
+    url: http://downloads.xiph.org/releases/ogg/libogg-1.3.3.tar.gz
+    dest: /root/ffmpeg_sources
+- unarchive:
+    src: /root/ffmpeg_sources/libogg-1.3.3.tar.gz
+    dest: /root/ffmpeg_sources
+- shell: ./configure --prefix="$HOME/ffmpeg_build" --disable-shared
+  args:
+    chdir: /root/ffmpeg_sources/libogg-1.3.3
+- make:
+    chdir: /root/ffmpeg_sources/libogg-1.3.3
+- make:
+    chdir: /root/ffmpeg_sources/libogg-1.3.3
+    target: install
+
+- name: libvorbis download
+  get_url:
+    url: http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz
+    dest: /root/ffmpeg_sources
+- unarchive:
+    src: /root/ffmpeg_sources/libvorbis-1.3.5.tar.gz
+    dest: /root/ffmpeg_sources
+- shell: ./configure --prefix="$HOME/ffmpeg_build" --with-ogg="$HOME/ffmpeg_build" --disable-shared
+  args:
+    chdir: /root/ffmpeg_sources/libvorbis-1.3.5
+- make:
+    chdir: /root/ffmpeg_sources/libvorbis-1.3.5
+- make:
+    chdir: /root/ffmpeg_sources/libvorbis-1.3.5
+    target: install
+
+- name: libtheora download
+  get_url:
+    url: https://ftp.osuosl.org/pub/xiph/releases/theora/libtheora-1.1.1.tar.gz
+    dest: /root/ffmpeg_sources
+- unarchive:
+    src: /root/ffmpeg_sources/libtheora-1.1.1.tar.gz
+    dest: /root/ffmpeg_sources
+- shell: ./configure --prefix="$HOME/ffmpeg_build" --with-ogg="$HOME/ffmpeg_build" --disable-shared
+  args:
+    chdir: /root/ffmpeg_sources/libtheora-1.1.1
+- make:
+    chdir: /root/ffmpeg_sources/libtheora-1.1.1
+- make:
+    chdir: /root/ffmpeg_sources/libtheora-1.1.1
+    target: install
+
+- name: libvpx download
+  git:
+    repo: https://chromium.googlesource.com/webm/libvpx.git
+    depth: 1
+    dest: /root/ffmpeg_sources/libvpx
+- shell: ./configure --prefix="$HOME/ffmpeg_build" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
+  args:
+    chdir: /root/ffmpeg_sources/libvpx
+- make:
+    chdir: /root/ffmpeg_sources/libvpx
+- make:
+    chdir: /root/ffmpeg_sources/libvpx
+    target: install
+
+- name: ffmepg download
+  get_url:
+    url: https://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2
+    dest: /root/ffmpeg_sources
+- unarchive:
+    src: /root/ffmpeg_sources/ffmpeg-snapshot.tar.bz2
+    dest: /root/ffmpeg_sources
+- shell: PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure --prefix="$HOME/ffmpeg_build" --pkg-config-flags="--static" --extra-cflags="-I$HOME/ffmpeg_build/include" --extra-ldflags="-L$HOME/ffmpeg_build/lib" --extra-libs=-lpthread --extra-libs=-lm --bindir="$HOME/bin" --enable-libfdk_aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvorbis --enable-libtheora --enable-libvpx --enable-libx264 --enable-nonfree --enable-gpl
+  args:
+    chdir: /root/ffmpeg_sources/ffmpeg
+- make:
+    chdir: /root/ffmpeg_sources/ffmpeg
+- make:
+    chdir: /root/ffmpeg_sources/ffmpeg
+    target: install
+- shell: hahs -r
+  args:
+    chdir: /root/ffmpeg_sources/ffmpeg

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-123951693-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-123951693-1');
+    </script>
+    <% unless @html_meta.nil? %>
+      <% if @html_meta.title.nil? %>
+        <title><%= Settings.site_title %></title>
+      <% else %>
+        <title><%= @html_meta.title %></title>
+      <% end %>
+      <% unless @html_meta.twitter_card.nil? %>
+        <meta name="twitter:card" content="<%= @html_meta.twitter_card %>" />
+      <% end %>
+      <% unless @html_meta.description.nil? %>
+        <meta property="og:description" content="<%= @html_meta.description %>">
+      <% end %>
+      <% unless @html_meta.image_url.nil? %>
+        <meta property="og:image" content="<%= @html_meta.image_url %>" />
+      <% end %>
+    <% end %>
+    <meta property="og:site_name" content="<%= Settings.site_title %>">
+    <meta property="og:title" content="<%= Settings.site_title %>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <%= csrf_meta_tags %>
+
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'application' %>
+  </head>
+
+  <body>
+    <nav class="navbar sticky-top navbar-dark bg-dark">
+      <a class="navbar-brand" href="/"><%= Settings.site_title %></a>
+      <%= form_tag({controller: :meta_frames, action: :index}, method: "get",class: "form-inline",enforce_utf8: false) do %>
+        <%= text_field_tag :words,@search_words,{:class=>"form-control mr-sm-2",:placeholder=>"画像を検索"} %>
+        <%= submit_tag("Search",:class=>"btn btn-outline-info my-2 my-sm-0",:name => nil) %>
+      <% end %>
+    </nav>
+    <%= yield %>
+  </body>
+</html>

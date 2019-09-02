@@ -1,0 +1,15 @@
+gcs_image_folder: /Users/lain/Movies/image_search
+site_title: アニメ会話画像検索
+gcp_project_id: hidden-matter-138223
+gcp_credentials: vendor/gcs/googleapikey.json
+bucket_name: image.imagesearch.biz
+site_domain: imagesearch.biz
+example_words:
+  - 了解
+  - 謝罪
+  - ごめん
+  - 残念
+  - ありがとう
+  - こんにちは
+  - 大丈夫
+  - 忙しい

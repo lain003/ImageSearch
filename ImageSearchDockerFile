@@ -1,0 +1,39 @@
+FROM ruby:2.5.5-slim-stretch
+ENV LANG C.UTF-8
+ENV PATH /bundle/bin:$PATH
+
+RUN mkdir -p /usr/share/man/man1
+
+RUN apt-get update -qq && apt-get install -y \
+    curl \
+    git \
+    build-essential \
+    zlib1g-dev \
+    default-jre \
+    default-libmysqlclient-dev \
+    libsqlite3-dev \
+    openjdk-8-jdk \
+    lsof \
+    ffmpeg \
+    wget \
+    fonts-indic \
+    fonts-noto \
+    fonts-noto-cjk
+
+## webpack
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+RUN apt-get install -y nodejs
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt-get update && apt-get install yarn
+
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+
+ENV imagesearch_root /home/imagesearch
+RUN mkdir ${imagesearch_root}
+WORKDIR ${imagesearch_root}
+ADD Gemfile .
+ADD Gemfile.lock .
+RUN bundle install
+
+RUN rake elastic_seed:run

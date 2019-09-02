@@ -1,0 +1,18 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="mx-auto col-md-6">
+      <ul class="share_buttons">
+        <li>
+          <a href="https://twitter.com/share?text=&url=<%= url_for(only_path: false) %>" data-size="large" class="twitter-share-button" data-show-count="false">
+            <%= image_tag 'twitter.png' %>
+          </a>
+        </li>
+        <li>
+          <button type="button" class="btn btn-primary" onClick="urlCopy('<%= url_for(only_path: false) %>')">URLをコピー</button>
+        </li>
+      </ul>
+      <%= image_tag(@edited_gif.cloud_url, :class => "img-fluid", :alt => "Responsive image") %>
+    </div>
+  </div>
+</div>
+

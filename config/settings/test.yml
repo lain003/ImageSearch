@@ -1,0 +1,3 @@
+elasticsearch:
+  host: elastic_search_test
+  port: 9200

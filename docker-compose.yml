@@ -1,0 +1,38 @@
+version: "3"
+services:
+  elastic_search_development:
+    build:
+      context: .
+      dockerfile: ElasticsearchDockerFile
+    expose:
+      - "9200"
+      - "9300"
+    environment:
+      - cluster.name=develop-cluster
+  elastic_search_test:
+    build:
+      context: .
+      dockerfile: ElasticsearchDockerFile
+    expose:
+      - "9200"
+      - "9300"
+    environment:
+      - cluster.name=test-cluster
+  image_search:
+    build:
+      context: .
+      dockerfile: ImageSearchDockerFile
+    ports:
+      - "3000:3000"
+      - "1234:1234"
+    volumes:
+      - .:/home/imagesearch
+      - bundle-data:/usr/local/bundle/
+    depends_on:
+      - elastic_search_development
+      - elastic_search_test
+    tty: true
+
+
+volumes:
+  bundle-data:

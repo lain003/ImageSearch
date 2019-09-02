@@ -1,0 +1,20 @@
+version: 2
+
+jobs:
+  js-test-and-build:
+    docker:
+      - image: circleci/node:8.9.4-stretch
+    steps:
+      - checkout
+
+      # JS unit tests
+      - run: yarn install --frozen-lockfile
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - js-test-and-build
+      - rspec_347:
+          requires:
+            - js-test-and-build

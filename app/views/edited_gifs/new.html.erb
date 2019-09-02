@@ -1,0 +1,69 @@
+<div class="container-fluid">
+  <div class="row">
+      <div class="mx-auto col-md-6">
+        <img id="example1">
+      </div>
+  </div>
+  <div class="row">
+    <div class="mx-auto col-md-6" id="gif_range">
+      Gifの範囲を指定する:<br>
+      <div id="slider">
+      </div>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="mx-auto">
+      <%= form_tag edited_gif_create_path(@meta_frame),:method => :post do |f| %>
+        <%= hidden_field :gif_length,:start_frame,id: :start_frame %>
+        <%= hidden_field :gif_length,:end_frame,id: :end_frame %>
+        <%= submit_tag "Create" ,:id => "submit_button",:disabled => "disabled",class: "btn btn-primary"%>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="/js/libgif/libgif.js"></script>
+<script type="text/javascript" src="/js/libgif/rubbable.js"></script>
+<script type="text/javascript" src="/js/nouislider.js"></script>
+<script>
+    var min_value = 0;
+    var max_value = 0;
+    function load_slider() {
+        var slider = document.getElementById('slider');
+        noUiSlider.create(slider, {
+            start: [0, sup1.get_length()],
+            connect: true,
+            range: {
+                'min': 0,
+                'max': sup1.get_length()
+            },
+            step:1
+        });
+
+        slider.noUiSlider.on('update', function (values, handle) {
+            min_value = values[0];
+            max_value = values[1];
+
+            var element = document.getElementById("start_frame");
+            element.setAttribute("value", min_value);
+            var element = document.getElementById("end_frame");
+            element.setAttribute("value", max_value);
+            var element = document.getElementById("submit_button");
+            element.removeAttribute("disabled");
+        });
+
+        max_value = sup1.get_length();
+    }
+
+    var sup1 = new SuperGif({
+        gif: document.getElementById('example1'), step_func: function (gif) {
+            current_frame = sup1.get_current_frame()
+            if(!(min_value < current_frame && current_frame < max_value)){
+                sup1.move_to(min_value)
+            }
+        }, on_end: function (gif) {
+            sup1.move_to(min_value)
+        }
+    });
+    sup1.load_url("<%= @meta_frame.gif_url %>",load_slider);
+</script>
