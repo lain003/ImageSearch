@@ -72,9 +72,9 @@ module Searchable
 
     def self.synonym_search(words)
       synonyms = []
-      kuromoji_ins = Kuromoji::Core.new
+      mecab = Natto::MeCab.new
       words.each do |word|
-        synonyms += Synonym.get_synonym_and_tokenize(word, kuromoji_ins)
+        synonyms += Synonym.get_synonym_and_tokenize(word, mecab)
       end
       MetaFrame.search(synonyms)
     end

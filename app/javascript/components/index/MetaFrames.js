@@ -37,17 +37,20 @@ class MetaFrames extends React.Component {
             {meta_frames.map((meta_frame) => (
               <MetaFrame meta_frame={meta_frame}
                          key={meta_frame.id}
-                         click_function={() => this.show_popup(meta_frame)} />
+                         click_function={() => this.show_popup(meta_frame)}
+                         twitter_image_path={this.props.twitter_image_path} />
             ))}
           </div>
         ))}
-        <Popup meta_frame={this.state.meta_frame} is_show={this.state.is_show} click_function={() => this.hide_popup()} />
+        <Popup meta_frame={this.state.meta_frame} is_show={this.state.is_show}
+               click_function={() => this.hide_popup()} />
       </React.Fragment>
     );
   }
 }
 
 MetaFrames.propTypes = {
-  meta_frames: PropTypes.array
+  meta_frames: PropTypes.array,
+  twitter_image_path: PropTypes.string
 };
 export default MetaFrames
