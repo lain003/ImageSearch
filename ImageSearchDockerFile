@@ -12,13 +12,18 @@ RUN apt-get update -qq && apt-get install -y \
     default-jre \
     default-libmysqlclient-dev \
     libsqlite3-dev \
-    openjdk-8-jdk \
+    mecab \
+    mecab-ipadic-utf8 \
     lsof \
     ffmpeg \
     wget \
     fonts-indic \
     fonts-noto \
     fonts-noto-cjk
+
+RUN sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN apt-get update -qq && apt-get install -y google-chrome-stable
 
 ## webpack
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
@@ -27,7 +32,7 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 RUN apt-get update && apt-get install yarn
 
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+ENV MECAB_PATH /usr/lib/x86_64-linux-gnu/libmecab.so.2
 
 ENV imagesearch_root /home/imagesearch
 RUN mkdir ${imagesearch_root}
@@ -35,5 +40,4 @@ WORKDIR ${imagesearch_root}
 ADD Gemfile .
 ADD Gemfile.lock .
 RUN bundle install
-
-RUN rake elastic_seed:run
+#RUN rake elastic_seed:run

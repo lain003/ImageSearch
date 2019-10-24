@@ -10,6 +10,7 @@ class MetaFramesController < ApplicationController
     @search_words = words.join(' ')
     title = @search_words + 'の検索結果'
     @html_meta = HTMLMeta.new(title: title, description: title)
+    @twitter_image_path = view_context.image_path('twitter.png')
   end
 
   def show

@@ -1,20 +1,106 @@
 version: 2
 
+references:
+  yarn_cache: &yarn_cache
+    key: v1-js-dep-{{ arch }}-{{ checksum "yarn.lock" }}
+    paths:
+      - node_modules
+  bundler_cache: &bundler_cache
+    key: v2-{{ checksum "Gemfile.lock" }}
+    paths:
+      - /home/circleci/project/vendor/bundler
+
 jobs:
-  js-test-and-build:
+  js-build:
     docker:
-      - image: circleci/node:8.9.4-stretch
+      - image: circleci/node:10.16.1-stretch
     steps:
       - checkout
 
-      # JS unit tests
+      - restore_cache:
+          <<: *yarn_cache
       - run: yarn install --frozen-lockfile
+      - save_cache:
+          <<: *yarn_cache
+          paths:
+            - node_modules
+      - persist_to_workspace:
+          root: .
+          paths: node_modules
+
+  rspec:
+    docker:
+      - image: circleci/ruby:2.6.4-browsers
+      - image: lain003/elascticsearch:latest
+        environment:
+          http.host: '0.0.0.0'
+          http.port: 9200
+          xpack.security.enabled: false
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
+
+      - run:
+          command: |
+            echo $GCLOUD_SERVICE_KEY | tr -d ' ' | base64 --decode > vendor/gcs/googleapikey.json
+
+      - run:
+          command: |
+            sudo apt-get update && sudo apt-get install -y mecab mecab-ipadic-utf8
+
+      # testのScreenShotの結果を日本語にする為
+      - run:
+          command: |
+            sudo apt-get install -y fonts-indic fonts-noto fonts-noto-cjk
+
+      - run:
+          command: |
+            curl -o wnjpn.db.gz http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz
+            gzip -d wnjpn.db.gz
+            mv wnjpn.db db/wnjpn.sqlite3
+
+      - restore_cache:
+          <<: *bundler_cache
+      - run:
+          command: |
+            bundle install --path vendor/bundler
+      - save_cache:
+          <<: *bundler_cache
+
+      - run:
+          command: |
+            curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+            echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+            sudo apt-get update && sudo apt-get install yarn
+            bundle exec rails generate react:install
+
+      - run:
+          command: |
+            bundle exec rake db:create db:migrate RAILS_ENV=test
+            bundle exec rake elastic_seed:run RAILS_ENV=test
+            bundle exec rspec --format progress --format RspecJunitFormatter -o ~/rspec/rspec.xml
+          environment:
+            CIRCLE_ARTIFACTS: ~/rspec
+
+      - store_artifacts:
+          path: ~/rspec
+
+      - store_artifacts:
+          path: ~/project/tmp/screenshots
+
+      - store_test_results:
+          path: ~/rspec
+
+    environment:
+      - IS_CIRCLECI: 1
+      - MECAB_PATH: /usr/lib/x86_64-linux-gnu/libmecab.so.2
 
 workflows:
   version: 2
   test:
     jobs:
-      - js-test-and-build
-      - rspec_347:
+      - js-build
+      - rspec:
           requires:
-            - js-test-and-build
+            - js-build

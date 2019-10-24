@@ -18,7 +18,7 @@ RSpec.describe Synonym do
     subject { Synonym.get_synonym_and_tokenize('庭には二羽、鶏がいる') }
 
     it '文章を形態素解析して助詞を外して、Synonymのインスタンスを返す' do
-      expect { subject.map(&:base_word) }.to match_array(%w[庭 二 羽 、 鶏 いる])
+      expect(subject.map(&:base_word)).to match_array(%w[庭 二 羽 、 鶏 いる])
     end
   end
 end

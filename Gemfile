@@ -67,6 +67,8 @@ group :development, :test do
   gem 'rails-controller-testing'
 
   gem 'webdrivers', '~> 4.0'
+
+  gem 'rspec_junit_formatter'
 end
 
 group :development do
@@ -92,8 +94,6 @@ gem 'config'
 
 gem 'fastimage'
 
-gem 'kuromoji-ruby'
-
 gem 'sitemap_generator'
 
 gem 'react-rails'
@@ -103,3 +103,5 @@ gem 'bootstrap', '~> 4.3.1'
 gem 'jquery-rails'
 
 gem 'js-routes'
+
+gem 'natto'

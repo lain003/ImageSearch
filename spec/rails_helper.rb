@@ -2,7 +2,6 @@
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
-require 'elasticsearch/extensions/test/cluster'
 require 'capybara'
 
 ENV['RAILS_ENV'] ||= 'test'

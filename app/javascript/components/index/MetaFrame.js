@@ -1,7 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
 import Popup from "reactjs-popup";
-import { twitter_png_path } from 'assets.js.erb'
 
 class MetaFrame extends React.Component {
   render () {
@@ -17,7 +16,7 @@ class MetaFrame extends React.Component {
             <div onClick={this.props.click_function}>
               <img className="img-fluid anime" alt="" src={this.props.meta_frame.image_url} />
             </div>
-            <Popup trigger={<img src={twitter_png_path} className="twitter-icon" />} position="top center">
+            <Popup trigger={<img src={this.props.twitter_image_path} className="twitter-icon" />} position="top center">
               <ul className={"type_choice"}>
                 <li>
                   <a href={twitter_path}>Imageを共有</a>
@@ -44,6 +43,7 @@ class MetaFrame extends React.Component {
 MetaFrame.propTypes = {
   meta_frame: PropTypes.object,
   click_function: PropTypes.func,
+  twitter_image_path: PropTypes.string
 };
 
 export default MetaFrame
