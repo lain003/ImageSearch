@@ -31,6 +31,8 @@ jobs:
   rspec:
     docker:
       - image: circleci/ruby:2.6.4-browsers
+        environment:
+          BUNDLER_VERSION: 2.0.2
       - image: lain003/elascticsearch:latest
         environment:
           http.host: '0.0.0.0'
@@ -40,6 +42,15 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/project
+
+      - run:
+          name: bundler update 2.0.2
+          command: |
+            sudo gem update --system
+            sudo gem uninstall bundler
+            sudo rm /usr/local/bin/bundle
+            sudo rm /usr/local/bin/bundler
+            sudo gem install bundler
 
       - run:
           command: |
