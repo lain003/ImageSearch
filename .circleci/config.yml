@@ -44,6 +44,15 @@ jobs:
           at: ~/project
 
       - run:
+          name: bundler update 2.0.2
+          command: |
+            sudo gem update --system
+            sudo gem uninstall bundler
+            sudo rm /usr/local/bin/bundle
+            sudo rm /usr/local/bin/bundler
+            sudo gem install bundler
+
+      - run:
           command: |
             echo $GCLOUD_SERVICE_KEY | tr -d ' ' | base64 --decode > vendor/gcs/googleapikey.json
 
