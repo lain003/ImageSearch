@@ -31,12 +31,13 @@ jobs:
   rspec:
     docker:
       - image: circleci/ruby:2.6.4-browsers
+        environment:
+          BUNDLER_VERSION: 2.0.2
       - image: lain003/elascticsearch:latest
         environment:
           http.host: '0.0.0.0'
           http.port: 9200
           xpack.security.enabled: false
-          BUNDLER_VERSION: 2.0.2
     steps:
       - checkout
       - attach_workspace:
