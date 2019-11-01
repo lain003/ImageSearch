@@ -1,121 +1,66 @@
-- hosts: localhost
+- name: EC2インスタンス作成
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars:
+    keypair_name: dev-key
+    ec2_name: test-ec2
+    region: ap-northeast-1
+    security_group_name: all_ssh
   tasks:
-    - name: install git etc...
-      yum:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - git
-        - gcc
-        - openssl-devel
-        - readline-devel
-        - zlib-devel
-        - sqlite-devel
-        - gcc-c++
-        - libicu-devel
-        - cmake
-        - bzip2
-        - mysql-devel
-        - java-1.8.0-openjdk
-        - java-1.8.0-openjdk-devel
-        - java-sdk
-        - initscripts
+    - name: AWSに認証鍵を登録
+      ec2_key:
+        name: "{{ keypair_name }}"
+      register: keypair_regst
 
-    - name: java8 version selected
-      alternatives:
-        name: java
-        path: /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
-
-    - name: Is Ruby Installed?
-      shell: ruby -v
-      failed_when: false
-      register: ruby_install
-      changed_when: '"ruby 2.5.1" not in ruby_install.stdout'
-    - name: download_ruby_build
-      git:
-        repo: 'https://github.com/rbenv/ruby-build.git'
-        dest: /root/ruby-build
-      register: result
-    - name: shell
-      shell: /root/ruby-build/install.sh
-      when: result.changed
-    - name: ruby install
-      shell: ruby-build 2.5.1 /opt/ruby-2.5.1 --verbose
-      when: result.changed
-    - name: add_path
-      shell: echo 'export PATH=/opt/ruby-2.5.1/bin:$PATH' >> /root/.bash_profile
-      when: result.changed
-    - name: add_manpath
-      shell: echo 'export MANPATH=:/opt/ruby-2.5.1/share/man' >> /root/.bash_profile
-      when: result.changed
-    - name: synbo link to ansible gem
-      shell: ln -s /opt/ruby-2.5.1/bin/gem /usr/local/sbin/gem
-      when: result.changed
-
-    - name: rails install
-      gem:
-        name: rails
-        version: 5.1.5
-        user_install: no
-
-    - name: yum add elasticsearch
-      template:
-        src: template/elasticsearch.repo
-        dest: /etc/yum.repos.d/elasticsearch.repo
-    - name: elasticsearch install
-      yum:
-        name: elasticsearch
-    - name: elastichsearch start
-      service:
-        name: elasticsearch
-        state: started
-        enabled: yes
-    - name: kuromozi install
-      shell: /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-kuromoji
-      register: result
-      failed_when: false
-      changed_when: '"already exists" not in result.stdout'
-
-    - name: install bundle
-      gem:
-        name: bundler
-        state: present
-        user_install: no
-
-    - name: project bundle install
-      bundler:
-        state: present
-        chdir: /root/imagesearch
-        executable: /opt/ruby-2.5.1/bin/bundle
-
-    - name: install nginx
-      yum:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - nginx
-    - name: copy nginx conf
-      template:
-        src: template/nginx/nginx.conf
-        dest: /etc/nginx/nginx.conf
-
-    - name: create nginx directory
+    - name: 認証鍵ファイル生成（権限：0400）
       file:
-        path: /etc/nginx/sites
-        state: directory
+        path=~/.ssh/{{ keypair_regst.key.name }}.pem
+        state=touch
+        mode=0400
 
-    - name: copy virtual host conf
-      template:
-        src: template/nginx/imagesearch.conf
-        dest: /etc/nginx/sites/imagesearch.conf
+    - name: 認証鍵ファイルにデータを追加
+      shell: echo "{{ keypair_regst.key.private_key }}" > ~/.ssh/{{ keypair_name }}.pem
+      when: keypair_regst.key.private_key is defined
 
-    - name: Is ffmpeg Installed?
-      shell: ffmpeg
-      failed_when: false
-      register: ffmpeg_result
-      changed_when: '"command not found" in ffmpeg_result.stdout'
+    - name: create_security_group
+      ec2_group:
+        name: "{{ security_group_name }}"
+        description: all_ssh
+        rules:
+          - proto: tcp
+            ports:
+              - 22
+            cidr_ip: 0.0.0.0/0
 
+    - name: EC2インスタンスの生成
+      ec2:
+        id: imagesearch7
+        instance_tags:
+          Name: "{{ ec2_name }}"
+        key_name: "{{ keypair_name }}"
+        instance_type: t2.small
+        image: ami-0ff21806645c5e492
+        region: "{{ region }}"
+        group: "{{ security_group_name }}"
+        wait: yes
+      register: ec2_regst
 
-- hosts: localhost
+    - name: インベントリにホストを追加
+      add_host:
+        groups=my_host
+        name="{{ ec2_regst.instances[0].public_ip }}"
+
+    - name: 作成したEC2が接続可能状態になるまで待つ
+      wait_for: port=22 host="{{ ec2_regst.instances[0].public_ip }}" delay=10  timeout=300
+
+- name: EC2インスタンスで作業
+  hosts: my_host
+  user: ec2-user
+  become: yes
+  environment:
+    PATH: "/root/.gem/ruby/2.5.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin"
   roles:
-    - { role: ffmpeg_install, when: "ffmpeg_result.changed"}
+    - galaxy/geerlingguy.ruby
+    - imagesearch_main
+    - ffmpeg_install

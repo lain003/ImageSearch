@@ -9,7 +9,7 @@
 #  pos    :text
 #
 
-class Word  < ApplicationRecord
+class Word < ApplicationRecord
   establish_connection(:wordnet)
   self.table_name = 'word'
 end
