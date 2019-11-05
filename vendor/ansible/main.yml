@@ -7,6 +7,7 @@
     ec2_name: test-ec2
     region: ap-northeast-1
     security_group_name: all_ssh
+    elastic_ip: 52.198.108.124
   tasks:
     - name: AWSに認証鍵を登録
       ec2_key:
@@ -31,6 +32,7 @@
           - proto: tcp
             ports:
               - 22
+              - 80
             cidr_ip: 0.0.0.0/0
 
     - name: EC2インスタンスの生成
@@ -53,6 +55,11 @@
 
     - name: 作成したEC2が接続可能状態になるまで待つ
       wait_for: port=22 host="{{ ec2_regst.instances[0].public_ip }}" delay=10  timeout=300
+
+    - name: associate an elastic IP with an instance
+      ec2_eip:
+        device_id: "{{ ec2_regst.instances[0].id }}"
+        ip: "{{ elastic_ip }}"
 
 - name: EC2インスタンスで作業
   hosts: my_host

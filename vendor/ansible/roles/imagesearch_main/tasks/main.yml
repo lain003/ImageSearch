@@ -19,6 +19,8 @@
       - java-1.8.0-openjdk-devel
       - java-sdk
       - initscripts
+      - mecab
+      - mecab-ipadic-utf8
 
 - name: yum add elasticsearch
   template:
@@ -37,6 +39,18 @@
   register: result
   failed_when: false
   changed_when: '"already exists" not in result.stdout'
+
+- shell: amazon-linux-extras install epel
+- yum:
+    name: https://packages.groonga.org/centos/groonga-release-latest.noarch.rpm
+- name: install mecab
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - mecab
+      - mecab-ipadic
 
 - name: clone repository
   git:
