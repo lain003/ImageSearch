@@ -131,11 +131,11 @@
         name: yarn
 
 - name: assets_precompile
-  shell: bundle exec rake assets:precompile RAILS_ENV=production
+  shell: source /root/.bash_profile && bundle exec rake assets:precompile RAILS_ENV=production
   args:
     chdir: /root/imagesearch
 - name: elastic_seed_run
-  shell: bundle exec rake elastic_seed:run RAILS_ENV=production
+  shell: source /root/.bash_profile && bundle exec rake elastic_seed:run RAILS_ENV=production
   args:
     chdir: /root/imagesearch
 
@@ -149,7 +149,7 @@
     dest: /root/imagesearch/db/wnjpn.sqlite3
 
 - name: rails s
-  shell: rails s -e production
+  shell: source /root/.bash_profile && rails s -e production
   args:
     chdir: /root/imagesearch
 
