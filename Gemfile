@@ -102,3 +102,5 @@ gem 'jquery-rails'
 gem 'js-routes'
 
 gem 'natto'
+
+gem 'rb-readline'

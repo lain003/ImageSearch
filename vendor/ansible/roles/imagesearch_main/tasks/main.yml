@@ -19,8 +19,6 @@
       - java-1.8.0-openjdk-devel
       - java-sdk
       - initscripts
-      - mecab
-      - mecab-ipadic-utf8
 
 - name: yum add elasticsearch
   template:
@@ -29,39 +27,81 @@
 - name: elasticsearch install
   yum:
     name: elasticsearch
-- name: elastichsearch start
-  service:
-    name: elasticsearch
-    state: started
-    enabled: yes
 - name: kuromozi install
   shell: /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-kuromoji
   register: result
   failed_when: false
   changed_when: '"already exists" not in result.stdout'
+- name: elastichsearch start
+  service:
+    name: elasticsearch
+    state: started
+    enabled: yes
 
-- shell: amazon-linux-extras install epel
-- yum:
-    name: https://packages.groonga.org/centos/groonga-release-latest.noarch.rpm
+
+- name: Is mecab Installed?
+  shell: type mecab
+  failed_when: false
+  register: result
+  changed_when: result.rc not in [0]
 - name: install mecab
-  yum:
-    name: "{{ packages }}"
-    state: present
-  vars:
-    packages:
-      - mecab
-      - mecab-ipadic
+  when: result.changed
+  block:
+  - shell: yes | amazon-linux-extras install epel
+  - yum:
+      name: https://packages.groonga.org/centos/groonga-release-latest.noarch.rpm
+  - name: set MECAB_PATH
+    blockinfile:
+      path: /root/.bash_profile
+      block: |
+        export MECAB_PATH=/usr/lib64/libmecab.so.2
+  - yum:
+      name: "{{ packages }}"
+      state: present
+    vars:
+      packages:
+        - mecab
+        - mecab-ipadic
+  - name: set MECAB_PATH
+    lineinfile:
+      path: /root/.bash_profile
+      regexp: '^export MECAB_PATH'
+      insertafter: EOF
+      line: export MECAB_PATH=/usr/lib64/libmecab.so.2
 
 - name: clone repository
   git:
     repo: https://github.com/lain003/ImageSearch.git
     dest: /root/imagesearch
+    version:
 
 # Cannot allocate memoryで落ちた場合は手動で実行
 - name: project bundle install
   bundler:
     state: present
     chdir: /root/imagesearch
+
+- name: Download db
+  get_url:
+    url: https://imageupload-z321.s3-ap-northeast-1.amazonaws.com/development.sqlite3
+    dest: /root/imagesearch/db/development.sqlite3
+
+- name: check $SECRET_KEY_BASE
+  shell: source /root/.bash_profile && echo $SECRET_KEY_BASE
+  register: result
+- name: set SECRET_KEY_BASE
+  when: result.stdout == ""
+  block:
+  - shell: source /root/.bash_profile && RAILS_ENV=production bundle exec rake secret
+    args:
+      chdir: /root/imagesearch
+    register: secret
+  - name: set SECRET_KEY_BASE
+    lineinfile:
+      path: /root/.bash_profile
+      regexp: '^export SECRET_KEY_BASE'
+      insertafter: EOF
+      line: export SECRET_KEY_BASE="{{ secret.stdout }}"
 
 - name: install nginx
   shell: yes | amazon-linux-extras install nginx1.12
@@ -77,6 +117,35 @@
   template:
     src: template/nginx/imagesearch.conf
     dest: /etc/nginx/sites/imagesearch.conf
+
+- name: Is yarn Installed?
+  shell: type yarn
+  failed_when: false
+  register: result
+  changed_when: result.rc not in [0]
+- name: install yarn
+  when: result.changed
+  block:
+    - shell: wget https://dl.yarnpkg.com/rpm/yarn.repo -O /etc/yum.repos.d/yarn.repo
+    - yum:
+        name: yarn
+
+- name: assets_precompile
+  shell: bundle exec rake assets:precompile RAILS_ENV=production
+- name: elastic_seed_run
+  shell: bundle exec rake elastic_seed:run RAILS_ENV=production
+
+- name: Download synonym
+  get_url:
+    url: http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz
+    dest: /tmp/wnjpn.db.gz
+- name: Unarchive synonym
+  unarchive:
+    src: /tmp/wnjpn.db.gz
+    dest: /root/imagesearch/db/wnjpn.sqlite3
+
+- name: rails s
+  shell: rails s -e production
 
 - name: nginxのサービススタート
   service:
