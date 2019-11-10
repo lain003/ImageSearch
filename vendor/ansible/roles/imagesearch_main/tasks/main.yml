@@ -73,7 +73,7 @@
   git:
     repo: https://github.com/lain003/ImageSearch.git
     dest: /root/imagesearch
-    version:
+    version: fix_ansible
 
 # Cannot allocate memoryで落ちた場合は手動で実行
 - name: project bundle install
