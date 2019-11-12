@@ -32,10 +32,10 @@
   register: result
   failed_when: false
   changed_when: '"already exists" not in result.stdout'
-- name: elastichsearch start
+- name: elastichsearch start #なぜかstart状態になっても起動してない事がある。２度実行すると正常に起動する模様。
   service:
     name: elasticsearch
-    state: started
+    state: restarted
     enabled: yes
 
 
@@ -73,7 +73,6 @@
   git:
     repo: https://github.com/lain003/ImageSearch.git
     dest: /root/imagesearch
-    version: fix_ansible
 
 # Cannot allocate memoryで落ちた場合は手動で実行
 - name: project bundle install
@@ -118,6 +117,17 @@
     src: template/nginx/imagesearch.conf
     dest: /etc/nginx/sites/imagesearch.conf
 
+- shell: curl -sL https://rpm.nodesource.com/setup_11.x | bash -
+  # 落としてきたnode11を適用したいのでけして入れる。
+- name: node js remove
+  yum:
+    name: nodejs
+    state: removed
+- name: install nodejs
+  yum:
+    name: nodejs
+    state: present
+
 - name: Is yarn Installed?
   shell: type yarn
   failed_when: false
@@ -126,9 +136,13 @@
 - name: install yarn
   when: result.changed
   block:
-    - shell: wget https://dl.yarnpkg.com/rpm/yarn.repo -O /etc/yum.repos.d/yarn.repo
-    - yum:
+    - get_url:
+        url: https://dl.yarnpkg.com/rpm/yarn.repo
+        dest: /etc/yum.repos.d/yarn.repo
+    - name: yarn install
+      yum:
         name: yarn
+        state: present
 
 - name: assets_precompile
   shell: source /root/.bash_profile && bundle exec rake assets:precompile RAILS_ENV=production
@@ -144,16 +158,25 @@
     url: http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz
     dest: /tmp/wnjpn.db.gz
 - name: Unarchive synonym
-  unarchive:
-    src: /tmp/wnjpn.db.gz
-    dest: /root/imagesearch/db/wnjpn.sqlite3
+  shell: gunzip /tmp/wnjpn.db.gz -c > /root/imagesearch/db/wnjpn.sqlite3
+
+- name: Transfer googleapikey.json
+  copy:
+    src: ../../vendor/gcs/googleapikey.json
+    dest: /root/imagesearch/vendor/gcs/googleapikey.json
 
 - name: rails s
   shell: source /root/.bash_profile && rails s -e production
   args:
     chdir: /root/imagesearch
 
+- name: rails restart
+  shell: source /root/.bash_profile && rails restart RAILS_ENV=production
+  args:
+    chdir: /root/imagesearch
+
 - name: nginxのサービススタート
   service:
     name: nginx
+    state: started
     enabled: yes

@@ -8,7 +8,7 @@
     region: ap-northeast-1
     security_group_name: all_ssh
     elastic_ip: 52.198.108.124
-    id: imagesearch8
+    id: image_search #idを変えたらssh-keygen -R 52.198.108.124とssh-keygen -R imagesearch.bizを実行する事
   tasks:
     - name: AWSに認証鍵を登録
       ec2_key:
