@@ -11,6 +11,15 @@ class MetaFramesController < ApplicationController
     title = @search_words + 'の検索結果'
     @html_meta = HTMLMeta.new(title: title, description: title)
     @twitter_image_path = view_context.image_path('twitter.png')
+    @image_paths = { twitter: view_context.image_path('twitter.png'),
+                     loading: view_context.image_path('loading.gif') }
+
+    respond_to do |format|
+      format.html
+      format.json do
+        render json: @view_meta_frames
+      end
+    end
   end
 
   def show

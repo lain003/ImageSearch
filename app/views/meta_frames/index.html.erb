@@ -10,12 +10,6 @@
     </ul>
   </div>
 
-  <div class="row" id="pagenation_top">
-    <div class="mx-auto pagenations">
-      <%= paginate @meta_frames %>
-    </div>
-  </div>
-
   <% if @search_form && @search_form.errors.any? %>
     <div id="error_explanation">
       <ul>
@@ -26,11 +20,7 @@
     </div>
   <% end %>
 
-  <%= react_component('index/MetaFrames', { meta_frames: @view_meta_frames, twitter_image_path: @twitter_image_path }) %>
-
-  <div class="row" id="pagenation_bottom">
-    <div class="mx-auto pagenations">
-        <%= paginate @meta_frames %>
-    </div>
-  </div>
+  <%= react_component('index/MetaFrames', { meta_frames: @view_meta_frames,
+                                            twitter_image_path: @twitter_image_path,
+                                            image_paths: @image_paths }) %>
 </div>
