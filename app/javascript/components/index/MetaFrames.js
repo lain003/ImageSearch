@@ -112,7 +112,6 @@ class MetaFrames extends React.Component {
 
 MetaFrames.propTypes = {
   meta_frames: PropTypes.array,
-  twitter_image_path: PropTypes.string,
   image_paths: PropTypes.object
 };
 export default MetaFrames

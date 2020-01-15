@@ -65,7 +65,7 @@ RSpec.feature 'MetaFramesIndex', type: :system, js: true, elasticsearch: true do
       visit meta_frames_index_path
       expect do
         page.execute_script 'window.scrollBy(0,$(document).height())'
-        wait_for_ajax
+        wait_for_block { all('.meta-frame')[20] }
       end.to change {
         page.find_all('.meta-frame').count
       }.from(20).to(21)
