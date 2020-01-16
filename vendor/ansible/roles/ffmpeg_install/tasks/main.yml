@@ -87,7 +87,7 @@
     register: result
   - name: libx264 download
     git:
-      repo: http://git.videolan.org/git/x264
+      repo: https://code.videolan.org/videolan/x264.git
       depth: 1
       dest: /root/ffmpeg_sources/x264
     when: result.changed
