@@ -79,7 +79,7 @@ class MetaFrames extends React.Component {
   }
 
   add_metaframes () {
-    if (this.state.is_end) {
+    if (this.state.is_end || this.state.is_loading) {
       return;
     }
 
