@@ -13,10 +13,10 @@ class MetaFrame extends React.Component {
       <React.Fragment>
         <div className="col-lg-6 meta-frame" test_data={this.props.meta_frame.id}>
           <div className="box">
-            <div onClick={this.props.click_function}>
+            <div onClick={ () => this.props.popupSnow(this.props.meta_frame) }>
               <img className="img-fluid anime" alt="" src={this.props.meta_frame.image_url} />
             </div>
-            <Popup trigger={<img src={this.props.twitter_image_path} className="twitter-icon" />} position="top center">
+            <Popup trigger={<img src={this.props.imagePaths["twitter"]} className="twitter-icon" />} position="top center">
               <ul className={"type_choice"}>
                 <li>
                   <a href={twitter_path}>Imageを共有</a>
@@ -41,9 +41,7 @@ class MetaFrame extends React.Component {
 
 
 MetaFrame.propTypes = {
-  meta_frame: PropTypes.object,
-  click_function: PropTypes.func,
-  twitter_image_path: PropTypes.string
+  meta_frame: PropTypes.object
 };
 
 export default MetaFrame
