@@ -2,17 +2,14 @@ require 'rails_helper'
 require 'google/cloud/storage'
 
 RSpec.feature 'MetaFramesIndex', type: :system, js: true, elasticsearch: true do
-  let!(:meta_frame_welcome) { create :meta_frame, :upload_image, text: 'ようこそ' }
-  let!(:meta_frame_hello) { create :meta_frame, :upload_image, text: 'こんにちは' }
+  let!(:meta_frame_welcome) { create :meta_frame, text: 'ようこそ' }
+  let!(:meta_frame_hello) { create :meta_frame, text: 'こんにちは' }
 
-  after(:each) do
-    storage = Google::Cloud::Storage.new(project_id: Settings.gcp_project_id,
-                                         credentials: Settings.gcp_credentials)
-    bucket = storage.bucket Settings.bucket_name
-    meta_frame_welcome.delete_gif(bucket)
-    meta_frame_welcome.delete_image(bucket)
-    meta_frame_hello.delete_gif(bucket)
-    meta_frame_hello.delete_image(bucket)
+  before(:each) do
+    allow_any_instance_of(MetaFrame).to receive(:image_url)
+                                            .and_return('http://image.imagesearch.biz/Chuunibyou/1/2/screenshot/15335.jpg')
+    allow_any_instance_of(MetaFrame).to receive(:gif_url)
+                                            .and_return('http://image.imagesearch.biz/Chuunibyou/1/2/gif/15335.gif')
   end
 
   scenario 'デフォルトでは「ようこそ」の検索結果が表示される' do
@@ -47,18 +44,7 @@ RSpec.feature 'MetaFramesIndex', type: :system, js: true, elasticsearch: true do
 
   context 'データが21件あるとき' do
     let!(:meta_frames) do
-      create_list(:meta_frame, 20, :upload_image, text: 'ようこそ')
-    end
-
-    after(:each) do
-      storage = Google::Cloud::Storage.new(project_id: Settings.gcp_project_id,
-                                           credentials: Settings.gcp_credentials)
-      bucket = storage.bucket Settings.bucket_name
-
-      meta_frames.each do |meta_frame|
-        meta_frame.delete_gif(bucket)
-        meta_frame.delete_image(bucket)
-      end
+      create_list(:meta_frame, 20, text: 'ようこそ')
     end
 
     scenario '最後までスクロールすると、データが追加される' do
