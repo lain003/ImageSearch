@@ -28,9 +28,6 @@ services:
     volumes:
       - .:/home/imagesearch
       - bundle-data:/usr/local/bundle/
-    depends_on:
-      - elastic_search_development
-      - elastic_search_test
     tty: true
 
 
