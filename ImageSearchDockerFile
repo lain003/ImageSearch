@@ -36,3 +36,5 @@ ENV MECAB_PATH /usr/lib/x86_64-linux-gnu/libmecab.so.2
 
 ENV imagesearch_root /home/imagesearch
 RUN mkdir ${imagesearch_root}
+
+RUN gem install bundler
