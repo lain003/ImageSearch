@@ -1,7 +1,7 @@
 FROM ruby:2.5.5-slim-stretch
 ENV LANG C.UTF-8
 ENV PATH /bundle/bin:$PATH
-
+ENV BUNDLER_VERSION 2.0.2
 RUN mkdir -p /usr/share/man/man1
 
 RUN apt-get update -qq && apt-get install -y \

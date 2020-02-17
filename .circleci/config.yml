@@ -5,7 +5,6 @@ jobs:
     docker:
       - image: circleci/ruby:2.7.0-buster
         environment:
-          BUNDLER_VERSION: 2.0.2
           DOCKER_API_VERSION: 1.39
     steps:
       - checkout
@@ -25,8 +24,8 @@ jobs:
           command: |
             docker-compose up -d image_search elastic_search_test
             docker cp . project_image_search_1:/home/imagesearch
-            docker-compose exec -w /home/imagesearch image_search bundle install
-            docker-compose exec image_search bundle exec rspec --out /tmp/test-results/rspec.xml spec/models/meta_frame_spec.rb
+            docker-compose exec image_search sh -c "cd /home/imagesearch && bundle install"
+            docker-compose exec image_search sh -c "cd /home/imagesearch && bundle exec rspec --out /tmp/test-results/rspec.xml spec/models/meta_frame_spec.rb"
             docker cp project_image_search_1:/tmp/test-results/rspec.xml /tmp/test-results/rspec.xml
 
       - store_test_results:
