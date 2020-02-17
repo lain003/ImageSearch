@@ -22,6 +22,13 @@ jobs:
           name: コンテナを起動し、動作していることを検証
           command: |
             docker-compose up -d image_search elastic_search_test
+            docker cp . project_image_search_1:/home/imagesearch
+            docker-compose exec image_search bundle install
+            docker-compose exec image_search bundle exec rspec --out /tmp/test-results/rspec.xml spec/models/meta_frame_spec.rb
+            docker cp project_image_search_1:/tmp/test-results/rspec.xml /tmp/test-results/rspec.xml
+
+      - store_test_results:
+          path: /tmp/test-results/rspec.xml
 #      - run:
 #          command: |
 #            echo $GCLOUD_SERVICE_KEY | tr -d ' ' | base64 --decode > vendor/gcs/googleapikey.json
@@ -38,8 +45,7 @@ jobs:
 #      - store_artifacts:
 #          path: ~/project/tmp/screenshots
 #
-#      - store_test_results:
-#          path: ~/rspec
+
 
 workflows:
   version: 2

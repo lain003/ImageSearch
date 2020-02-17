@@ -36,8 +36,3 @@ ENV MECAB_PATH /usr/lib/x86_64-linux-gnu/libmecab.so.2
 
 ENV imagesearch_root /home/imagesearch
 RUN mkdir ${imagesearch_root}
-WORKDIR ${imagesearch_root}
-ADD Gemfile .
-ADD Gemfile.lock .
-RUN bundle install
-#RUN rake elastic_seed:run
