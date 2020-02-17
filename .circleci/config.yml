@@ -9,24 +9,24 @@ jobs:
     steps:
       - checkout
 
-      - run:
-          name: Docker Compose をインストール
-          command: |
-            curl -L https://github.com/docker/compose/releases/download/1.25.4/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-            chmod +x ~/docker-compose
-            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+#      - run:
+#          name: Docker Compose をインストール
+#          command: |
+#            curl -L https://github.com/docker/compose/releases/download/1.25.4/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+#            chmod +x ~/docker-compose
+#            sudo mv ~/docker-compose /usr/local/bin/docker-compose
 
       - setup_remote_docker:
           docker_layer_caching: false # 有料プランならtrue
 
-      - run:
-          name: コンテナを起動し、動作していることを検証
-          command: |
-            docker-compose up -d image_search elastic_search_test
-            docker cp . project_image_search_1:/home/imagesearch
-            docker-compose exec -w /home/imagesearch image_search bundle install
-            docker-compose exec image_search bundle exec rspec --out /tmp/test-results/rspec.xml spec/models/meta_frame_spec.rb
-            docker cp project_image_search_1:/tmp/test-results/rspec.xml /tmp/test-results/rspec.xml
+#      - run:
+#          name: コンテナを起動し、動作していることを検証
+#          command: |
+#            docker-compose up -d image_search elastic_search_test
+#            docker cp . project_image_search_1:/home/imagesearch
+#            docker-compose exec -w /home/imagesearch image_search bundle install
+#            docker-compose exec image_search bundle exec rspec --out /tmp/test-results/rspec.xml spec/models/meta_frame_spec.rb
+#            docker cp project_image_search_1:/tmp/test-results/rspec.xml /tmp/test-results/rspec.xml
 
       - store_test_results:
           path: /tmp/test-results/rspec.xml
