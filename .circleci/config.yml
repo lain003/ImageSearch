@@ -3,9 +3,9 @@ version: 2
 jobs:
   rspec:
     docker:
-      - image: circleci/ruby:2.6.4-browsers
-        environment:
-          BUNDLER_VERSION: 2.0.2
+      - image: circleci/ruby:2.7.0-buster
+#        environment:
+#          BUNDLER_VERSION: 2.0.2
     steps:
       - checkout
 
