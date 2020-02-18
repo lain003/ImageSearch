@@ -23,7 +23,6 @@ jobs:
           name: docker-compose up
           command: |
             docker-compose up -d image_search elastic_search_test
-            docker cp . project_image_search_1:/home/imagesearch
 
       - run:
           name: 下準備
