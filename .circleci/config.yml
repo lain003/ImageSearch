@@ -8,7 +8,7 @@ references:
   bundler_cache: &bundler_cache
     key: v1-bundler-{{ arch }}-{{ checksum "Gemfile.lock" }}
     paths:
-      - /home/circleci/project/vendor/bundler
+      - /usr/local/bundle
 
 jobs:
   rspec:
@@ -50,7 +50,7 @@ jobs:
             docker cp wnjpn.db project_image_search_1:/home/imagesearch/db/wnjpn.sqlite3
             echo $GCLOUD_SERVICE_KEY | tr -d ' ' | base64 --decode > tmp/googleapikey.json
             docker cp tmp/googleapikey.json project_image_search_1:/home/imagesearch/vendor/gcs/googleapikey.json
-            docker cp project_image_search_1:/home/imagesearch/vendor/bundler vendor/bundler
+            docker cp project_image_search_1:/usr/local/bundle /usr/local/bundle
             docker cp project_image_search_1:/home/imagesearch/node_modules node_modules
       - save_cache:
           <<: *bundler_cache
