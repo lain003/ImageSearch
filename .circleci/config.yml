@@ -41,12 +41,12 @@ jobs:
       - run:
           name: 下準備
           command: |
-            mkdir bundler_cache
+            mkdir  -p bundler_cache
             docker cp bundler_cache project_image_search_1:/usr/local/bundle
             docker cp . project_image_search_1:/home/imagesearch
             docker-compose exec image_search sh -c "cd /home/imagesearch && bundle install"
             docker-compose exec image_search sh -c "cd /home/imagesearch && yarn install --frozen-lockfile"
-            mkdir /tmp/test-results
+            mkdir -p /tmp/test-results
             curl -o wnjpn.db.gz http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz
             gzip -d wnjpn.db.gz
             docker cp wnjpn.db project_image_search_1:/home/imagesearch/db/wnjpn.sqlite3
