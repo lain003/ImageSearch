@@ -6,7 +6,7 @@ references:
     paths:
       - node_modules
   bundler_cache: &bundler_cache
-    key: v1-bundler-{{ arch }}-{{ checksum "Gemfile.lock" }}
+    key: v2-bundler-{{ arch }}-{{ checksum "Gemfile.lock" }}
     paths:
       - bundler_cache
 
