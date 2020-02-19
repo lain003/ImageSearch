@@ -85,8 +85,8 @@ gem 'mysql2'
 gem 'kaminari'
 
 # https://ulab.hatenablog.com/entry/20191013/1570930332と同じエラーが出た為、version down
-gem 'elasticsearch-rails', git: 'https://github.com/elastic/elasticsearch-rails.git', branch: '6.x'
 gem 'elasticsearch-model', git: 'https://github.com/elastic/elasticsearch-rails.git', branch: '6.x'
+gem 'elasticsearch-rails', git: 'https://github.com/elastic/elasticsearch-rails.git', branch: '6.x'
 
 gem 'config'
 

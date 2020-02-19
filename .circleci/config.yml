@@ -1,5 +1,15 @@
 version: 2
 
+references:
+  yarn_cache: &yarn_cache
+    key: v1-js-dep-{{ arch }}-{{ checksum "yarn.lock" }}
+    paths:
+      - /home/circleci/project/node_modules
+  bundler_cache: &bundler_cache
+    key: v1-bundler-{{ arch }}-{{ checksum "Gemfile.lock" }}
+    paths:
+      - /home/circleci/project/vendor/bundler
+
 jobs:
   rspec:
     docker:
@@ -19,6 +29,9 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: false # 有料プランならtrue
 
+      - restore_cache:
+          <<: *bundler_cache
+          <<: *yarn_cache
       - run:
           name: docker-compose up
           command: |
@@ -29,13 +42,18 @@ jobs:
           command: |
             docker cp . project_image_search_1:/home/imagesearch
             docker-compose exec image_search sh -c "cd /home/imagesearch && bundle install"
+            docker-compose exec image_search sh -c "cd /home/imagesearch && yarn install --frozen-lockfile"
             mkdir /tmp/test-results
             curl -o wnjpn.db.gz http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz
             gzip -d wnjpn.db.gz
             docker cp wnjpn.db project_image_search_1:/home/imagesearch/db/wnjpn.sqlite3
             echo $GCLOUD_SERVICE_KEY | tr -d ' ' | base64 --decode > tmp/googleapikey.json
             docker cp tmp/googleapikey.json project_image_search_1:/home/imagesearch/vendor/gcs/googleapikey.json
-
+            docker cp vendor/bundler project_image_search_1:/home/imagesearch/vendor/bundler
+            docker cp node_modules project_image_search_1:/home/imagesearch/node_modules
+      - save_cache:
+          <<: *bundler_cache
+          <<: *yarn_cache
       - run:
           name: テスト実行
           command: |
