@@ -32,6 +32,7 @@ jobs:
       - restore_cache:
           <<: *bundler_cache
           <<: *yarn_cache
+
       - run:
           name: docker-compose up
           command: |
@@ -49,8 +50,8 @@ jobs:
             docker cp wnjpn.db project_image_search_1:/home/imagesearch/db/wnjpn.sqlite3
             echo $GCLOUD_SERVICE_KEY | tr -d ' ' | base64 --decode > tmp/googleapikey.json
             docker cp tmp/googleapikey.json project_image_search_1:/home/imagesearch/vendor/gcs/googleapikey.json
-            docker cp vendor/bundler project_image_search_1:/home/imagesearch/vendor/bundler
-            docker cp node_modules project_image_search_1:/home/imagesearch/node_modules
+            docker cp project_image_search_1:/home/imagesearch/vendor/bundler vendor/bundler
+            docker cp project_image_search_1:/home/imagesearch/node_modules node_modules
       - save_cache:
           <<: *bundler_cache
           <<: *yarn_cache
