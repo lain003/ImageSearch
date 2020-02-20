@@ -6,9 +6,11 @@ references:
     paths:
       - node_modules
   bundler_cache: &bundler_cache
-    key: v3-bundler-{{ arch }}-{{ checksum "Gemfile.lock" }}
-    paths:
-      - bundle
+    keys:
+      - gem-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+      - gem-cache-v1-{{ arch }}-{{ .Branch }}
+      - gem-cache-v1
+    paths: vendor/bundle
 
 jobs:
   rspec:
@@ -31,6 +33,7 @@ jobs:
 
       - restore_cache:
           <<: *bundler_cache
+      - restore_cache:
           <<: *yarn_cache
 
       - run:
@@ -41,10 +44,8 @@ jobs:
       - run:
           name: 下準備
           command: |
-            mkdir  -p bundle
-            docker cp bundle project_image_search_1:/usr/local
             docker cp . project_image_search_1:/home/imagesearch
-            docker-compose exec image_search sh -c "cd /home/imagesearch && bundle install"
+            docker-compose exec image_search sh -c "cd /home/imagesearch && bundle install --path vendor/bundle"
             docker-compose exec image_search sh -c "cd /home/imagesearch && yarn install --frozen-lockfile"
             mkdir -p /tmp/test-results
             curl -o wnjpn.db.gz http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz
@@ -52,11 +53,14 @@ jobs:
             docker cp wnjpn.db project_image_search_1:/home/imagesearch/db/wnjpn.sqlite3
             echo $GCLOUD_SERVICE_KEY | tr -d ' ' | base64 --decode > tmp/googleapikey.json
             docker cp tmp/googleapikey.json project_image_search_1:/home/imagesearch/vendor/gcs/googleapikey.json
-            docker cp project_image_search_1:/usr/local/bundle bundle
+            docker cp project_image_search_1:/home/imagesearch/vendor/bundle vendor/bundle
             docker cp project_image_search_1:/home/imagesearch/node_modules node_modules
+
       - save_cache:
           <<: *bundler_cache
+      - save_cache:
           <<: *yarn_cache
+
       - run:
           name: テスト実行
           command: |
