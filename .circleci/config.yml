@@ -61,10 +61,11 @@ jobs:
           name: テスト実行
           command: |
             docker-compose exec image_search sh -c "cd /home/imagesearch && bundle exec rspec --format progress --format RspecJunitFormatter --out /tmp/test-results/rspec.xml"
+            mkdir -p ~/rspec
             docker cp project_image_search_1:/tmp/test-results/rspec.xml ~/rspec/rspec.xml
 
       - store_test_results:
-          path: /tmp/test-results/rspec.xml
+          path: ~/rspec/rspec.xml
 
 #      - store_artifacts:
 #          path: ~/rspec
