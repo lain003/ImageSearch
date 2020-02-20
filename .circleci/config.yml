@@ -62,6 +62,7 @@ jobs:
           name: テスト実行
           command: |
             docker-compose exec image_search sh -c "cd /home/imagesearch && bundle exec rspec --format progress --format RspecJunitFormatter --out /tmp/test-results/rspec.xml"
+            docker-compose exec image_search sh -c "mkdir -p /home/imagesearch/tmp/screenshots"
             mkdir -p ~/test-results/rspec/
             docker cp project_image_search_1:/tmp/test-results/rspec.xml ~/test-results/rspec/rspec.xml
             docker cp project_image_search_1:/home/imagesearch/tmp/screenshots ~/test-results/screenshots
@@ -70,8 +71,6 @@ jobs:
           path: /home/circleci/test-results
       - store_artifacts:
           path: /home/circleci/test-results/screenshots
-#
-
 
 workflows:
   version: 2
