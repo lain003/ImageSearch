@@ -72,6 +72,20 @@ jobs:
       - store_artifacts:
           path: /home/circleci/test-results/screenshots
 
+      - run:
+          name: ElasticSearchPush
+          command: |
+            docker commit project_elastic_search_test_1 release_elastic_search
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            docker push lain003/release_elastic_search
+
+      - run:
+          name: ImagePush
+          command: |
+            docker commit project_image_search_1 release_image_search
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            docker push lain003/release_image_search
+
 workflows:
   version: 2
   test:
