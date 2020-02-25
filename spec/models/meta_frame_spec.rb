@@ -42,7 +42,7 @@ RSpec.describe MetaFrame, type: :model, elasticsearch: true do
         results = subject.results
         base_score = results.select { |a| a['_id'] == meta_frame.id.to_s }.first['_score']
         synonym_score = results.select { |a| a['_id'] == synonym_meta_frame.id.to_s }.first['_score']
-        expect(base_score).to be >= 1000000
+        expect(base_score).to be >= synonym_score
       end
     end
   end
