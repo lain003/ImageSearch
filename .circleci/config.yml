@@ -72,6 +72,30 @@ jobs:
       - store_artifacts:
           path: /home/circleci/test-results/screenshots
 
+      # ここからmaster
+      - run:
+          name: SECRET_KEY_BASEとassetsとseed
+          command: |
+            docker-compose exec image_search sh -c "cd /home/imagesearch && export SECRET_KEY_BASE=`RAILS_ENV=production bundle exec rake secret`"
+            docker-compose exec image_search sh -c "cd /home/imagesearch && bundle exec rake assets:precompile RAILS_ENV=production"
+# docker-compose exec image_search sh -c "cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production"
+
+      - run:
+          name: rails s
+          command: |
+            docker-compose exec image_search sh -c "cd /home/imagesearch && rails s -e production"
+
+      - run:
+          name: Nginxインストール etc
+          command: |
+            docker-compose exec image_search sh -c "apt-get update"
+            docker-compose exec image_search sh -c "apt-get install nginx"
+            docker cp vendor/circleci/tmpplate/nginx/nginx.conf project_image_search_1:/etc/nginx/nginx.conf
+            docker-compose exec image_search sh -c "mkdir -p ~/etc/nginx/sites"
+            docker cp vendor/circleci/template/nginx/imagesearch.conf project_image_search_1:/etc/nginx/sites/imagesearch.conf
+            docker-compose exec image_search sh -c "systemctl enable nginx"
+            docker-compose exec image_search sh -c "systemctl start nginx"
+
       - run:
           name: ElasticSearchPush
           command: |

@@ -1,0 +1,11 @@
+version: '3'
+services:
+  web:
+    image: lain003/release_image_search
+    ports:
+      - "80:80"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: imageSearch
+        awslogs-stream-prefix: web
