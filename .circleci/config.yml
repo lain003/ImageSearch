@@ -76,8 +76,8 @@ jobs:
       - run:
           name: SECRET_KEY_BASEとassetsとseed
           command: |
-            docker-compose exec image_search sh -c "cd /home/imagesearch && echo export SECRET_KEY_BASE=`RAILS_ENV=production bundle exec rake secret` >> ~/.bashrc"
-            docker-compose exec image_search sh -c "cd /home/imagesearch && bundle exec rake assets:precompile RAILS_ENV=production"
+            docker-compose exec image_search sh -i -c 'cd /home/imagesearch && echo export SECRET_KEY_BASE=`RAILS_ENV=production bundle exec rake secret` >> ~/.bashrc'
+            docker-compose exec image_search sh -i -c "cd /home/imagesearch && bundle exec rake assets:precompile RAILS_ENV=production"
 # docker-compose exec image_search sh -c "cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production"
 
       - run:
