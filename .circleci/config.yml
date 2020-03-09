@@ -92,7 +92,7 @@ jobs:
             docker-compose exec image_search bash -c 'apt-get update'
             docker-compose exec image_search bash -c 'apt-get install -y nginx'
             docker cp vendor/circleci/template/nginx/nginx.conf project_image_search_1:/etc/nginx/nginx.conf
-            docker-compose exec image_search bash -c 'mkdir -p ~/etc/nginx/sites'
+            docker-compose exec image_search bash -c 'mkdir -p /etc/nginx/sites'
             docker cp vendor/circleci/template/nginx/imagesearch.conf project_image_search_1:/etc/nginx/sites/imagesearch.conf
             docker-compose exec image_search bash -c 'update-rc.d nginx enable'
             docker-compose exec image_search bash -c 'service nginx start'
