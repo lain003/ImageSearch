@@ -42,8 +42,8 @@ jobs:
           name: 下準備
           command: |
             docker cp . project_image_search_1:/home/imagesearch
-            docker-compose exec image_search sh -c "cd /home/imagesearch && bundle install --path vendor/bundle"
-            docker-compose exec image_search sh -c "cd /home/imagesearch && yarn install --frozen-lockfile"
+            docker-compose exec image_search bash -c 'cd /home/imagesearch && bundle install --path vendor/bundle'
+            docker-compose exec image_search bash -c 'cd /home/imagesearch && yarn install --frozen-lockfile'
             mkdir -p /tmp/test-results
             curl -o wnjpn.db.gz http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz
             gzip -d wnjpn.db.gz
@@ -61,8 +61,8 @@ jobs:
       - run:
           name: テスト実行
           command: |
-            docker-compose exec image_search sh -c "cd /home/imagesearch && bundle exec rspec --format progress --format RspecJunitFormatter --out /tmp/test-results/rspec.xml"
-            docker-compose exec image_search sh -c "mkdir -p /home/imagesearch/tmp/screenshots"
+            docker-compose exec image_search bash -c 'cd /home/imagesearch && bundle exec rspec --format progress --format RspecJunitFormatter --out /tmp/test-results/rspec.xml'
+            docker-compose exec image_search bash -c 'mkdir -p /home/imagesearch/tmp/screenshots'
             mkdir -p ~/test-results/rspec/
             docker cp project_image_search_1:/tmp/test-results/rspec.xml ~/test-results/rspec/rspec.xml
             docker cp project_image_search_1:/home/imagesearch/tmp/screenshots ~/test-results/screenshots
@@ -76,25 +76,26 @@ jobs:
       - run:
           name: SECRET_KEY_BASEとassetsとseed
           command: |
-            docker-compose exec image_search sh -i -c 'cd /home/imagesearch && echo export SECRET_KEY_BASE=`RAILS_ENV=production bundle exec rake secret` >> ~/.bashrc'
-            docker-compose exec image_search sh -i -c "cd /home/imagesearch && bundle exec rake assets:precompile RAILS_ENV=production"
-# docker-compose exec image_search sh -c "cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production"
+            docker-compose exec image_search bash -i -c 'cd /home/imagesearch && echo export SECRET_KEY_BASE=`RAILS_ENV=production bundle exec rake secret` >> ~/.bashrc'
+            docker-compose exec image_search bash -i -c 'cd /home/imagesearch && bundle exec rake assets:precompile RAILS_ENV=production'
+            docker-compose exec image_search bash -i -c 'cd /home/imagesearch && yarn install --frozen-lockfile'
+# docker-compose exec image_search sh -c 'cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production'
 
       - run:
           name: rails s
           command: |
-            docker-compose exec image_search sh -c "cd /home/imagesearch && rails s -e production"
+            docker-compose exec image_search bash -i -c 'cd /home/imagesearch && bundle exec rails s -e production'
 
       - run:
           name: Nginxインストール etc
           command: |
-            docker-compose exec image_search sh -c "apt-get update"
-            docker-compose exec image_search sh -c "apt-get install nginx"
+            docker-compose exec image_search bash -c 'apt-get update'
+            docker-compose exec image_search bash -c 'apt-get install nginx'
             docker cp vendor/circleci/tmpplate/nginx/nginx.conf project_image_search_1:/etc/nginx/nginx.conf
-            docker-compose exec image_search sh -c "mkdir -p ~/etc/nginx/sites"
+            docker-compose exec image_search bash -c 'mkdir -p ~/etc/nginx/sites'
             docker cp vendor/circleci/template/nginx/imagesearch.conf project_image_search_1:/etc/nginx/sites/imagesearch.conf
-            docker-compose exec image_search sh -c "systemctl enable nginx"
-            docker-compose exec image_search sh -c "systemctl start nginx"
+            docker-compose exec image_search bash -c 'systemctl enable nginx'
+            docker-compose exec image_search bash -c 'systemctl start nginx'
 
       - run:
           name: ElasticSearchPush
