@@ -36,7 +36,7 @@ jobs:
       - run:
           name: docker-compose up
           command: |
-            docker-compose up -d image_search elastic_search_test
+            docker-compose -f docker-compose-ci.yml up
 
       - run:
           name: 下準備
@@ -100,7 +100,6 @@ jobs:
           command: |
             docker commit project_elastic_search_test_1 release_elastic_search
             docker tag release_elastic_search lain003/release_elastic_search
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD --password-stdin
             docker push lain003/release_elastic_search
 
       - run:
@@ -108,7 +107,7 @@ jobs:
           command: |
             docker commit project_image_search_1 release_image_search
             docker tag release_image_search lain003/release_image_search
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD --password-stdin
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker push lain003/release_image_search
 
 workflows:

@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+  elastic_search_test:
+    build:
+      context: .
+      dockerfile: ElasticsearchDockerFile
+    expose:
+      - "9200"
+      - "9300"
+    environment:
+      - cluster.name=test-cluster
+      - discovery.type=single-node
+  image_search:
+    build:
+      context: .
+      dockerfile: ImageSearchDockerFile
+    ports:
+      - "3000:3000"
+      - "1234:1234"
+    tty: true
