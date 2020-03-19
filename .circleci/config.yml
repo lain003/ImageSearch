@@ -79,7 +79,7 @@ jobs:
             docker-compose exec image_search bash -i -c 'cd /home/imagesearch && echo export SECRET_KEY_BASE=`RAILS_ENV=production bundle exec rake secret` >> ~/.bashrc'
             docker-compose exec image_search bash -i -c 'cd /home/imagesearch && bundle exec rake assets:precompile RAILS_ENV=production'
             docker-compose exec image_search bash -i -c 'cd /home/imagesearch && yarn install --frozen-lockfile'
-# docker-compose exec image_search sh -c 'cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production'
+# docker-compose exec image_search bash -c 'cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production'
 
       - run:
           name: rails s
@@ -94,15 +94,13 @@ jobs:
             docker cp vendor/circleci/template/nginx/nginx.conf project_image_search_1:/etc/nginx/nginx.conf
             docker-compose exec image_search bash -c 'mkdir -p /etc/nginx/sites'
             docker cp vendor/circleci/template/nginx/imagesearch.conf project_image_search_1:/etc/nginx/sites/imagesearch.conf
-            docker-compose exec image_search bash -c 'update-rc.d nginx enable'
-            docker-compose exec image_search bash -c 'service nginx start'
 
       - run:
           name: ElasticSearchPush
           command: |
             docker commit project_elastic_search_test_1 release_elastic_search
             docker tag release_elastic_search lain003/release_elastic_search
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD --password-stdin
             docker push lain003/release_elastic_search
 
       - run:
@@ -110,7 +108,7 @@ jobs:
           command: |
             docker commit project_image_search_1 release_image_search
             docker tag release_image_search lain003/release_image_search
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD --password-stdin
             docker push lain003/release_image_search
 
 workflows:

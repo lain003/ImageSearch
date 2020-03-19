@@ -1,11 +1,21 @@
 version: '3'
 services:
-  web:
+  image_search:
     image: lain003/release_image_search
     ports:
       - "80:80"
-    logging:
-      driver: awslogs
-      options:
-        awslogs-group: imageSearch
-        awslogs-stream-prefix: web
+    command: nginx -g "daemon off;"
+#    logging:
+#      driver: awslogs
+#      options:
+#        awslogs-group: imageSearch
+#        awslogs-region: ap-northeast-1
+#        awslogs-stream-prefix: web
+  elastic_search:
+    image: lain003/release_elastic_search
+    expose:
+      - "9200"
+      - "9300"
+    environment:
+      - cluster.name=develop-cluster
+      - discovery.type=single-node

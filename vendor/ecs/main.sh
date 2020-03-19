@@ -4,6 +4,8 @@ ecs-cli configure --cluster imageSearch --default-launch-type FARGATE --config-n
 ecs-cli up --cluster-config imageSearch
 aws ec2 describe-security-groups --filters Name=vpc-id,Values=~~~~
 aws ec2 authorize-security-group-ingress --group-id ~~~~~ --protocol tcp --port 80 --cidr 0.0.0.0/0
-ecs-cli compose --project-name imageSearch  --file docker-compose-ecs.yml --ecs-params ecs-params.yml service up --create-log-groups --cluster-config imageSearch
-ecs-cli compose --project-name imageSearch  --file docker-compose-ecs.yml --ecs-params ecs-params.yml  service ps --cluster-config imageSearch
-ecs-cli compose --project-name imageSearch  --file docker-compose-ecs.yml service down --cluster-config imageSearch
+aws secretsmanager create-secret --name DockerHubLogin --description "DockerHubLogin" --secret-string file://vendor/ecs/docker-hub.json
+ecs-cli compose --project-name imageSearch --file docker-compose-ecs.yml --ecs-params ecs-params.yml service up --create-log-groups --cluster-config imageSearch
+ecs-cli compose --project-name imageSearch --file docker-compose-ecs.yml --ecs-params ecs-params.yml service ps --cluster-config imageSearch
+ecs-cli compose --project-name imageSearch --file docker-compose-ecs.yml service down --cluster-config imageSearch
+
