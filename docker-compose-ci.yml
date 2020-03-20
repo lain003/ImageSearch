@@ -21,3 +21,6 @@ services:
       - .:/home/imagesearch
       - bundle-data:/usr/local/bundle/
     tty: true
+
+volumes:
+  bundle-data:
