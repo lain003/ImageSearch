@@ -17,4 +17,7 @@ services:
     ports:
       - "3000:3000"
       - "1234:1234"
+    volumes:
+      - .:/home/imagesearch
+      - bundle-data:/usr/local/bundle/
     tty: true
