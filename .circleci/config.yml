@@ -83,11 +83,6 @@ jobs:
 # docker-compose exec image_search bash -c 'cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production'
 
       - run:
-          name: rails s
-          command: |
-            docker-compose exec image_search bash -i -c 'cd /home/imagesearch && bundle exec rails s -e production'
-
-      - run:
           name: Nginxインストール etc
           command: |
             docker-compose exec image_search bash -c 'apt-get update'

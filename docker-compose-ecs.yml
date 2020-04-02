@@ -4,7 +4,9 @@ services:
     image: lain003/release_image_search
     ports:
       - "80:80"
-    command: nginx -g "daemon off;"
+    command: >
+      bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production &&
+            nginx -g "daemon off;"'
 #    logging:
 #      driver: awslogs
 #      options:
