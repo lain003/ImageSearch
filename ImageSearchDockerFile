@@ -1,5 +1,6 @@
 FROM debian:stretch-20200327-slim
 ENV LANG C.UTF-8
+ENV PATH /root/.rbenv/shims:$PATH
 RUN mkdir -p /usr/share/man/man1
 
 RUN apt-get update -qq && apt-get install -y \
