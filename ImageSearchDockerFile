@@ -13,6 +13,7 @@ RUN apt-get update -qq && apt-get install -y \
     build-essential \
     zlib1g-dev \
     default-jre \
+    mysql-client \
     libmysqlclient-dev \
     libsqlite3-dev \
     mecab \
