@@ -4,8 +4,8 @@ ENV PATH /root/.rbenv/shims:$PATH
 RUN mkdir -p /usr/share/man/man1
 
 RUN sed -i -e "$ a deb http://www.deb-multimedia.org jessie main non-free\ndeb-src http://www.deb-multimedia.org jessie main non-free\n" /etc/apt/sources.list
-RUN apt-get update && apt-get install deb-multimedia-keyring
-RUN apt-get update && apt-get install ffmpeg
+RUN apt-get update -y && apt-get install -y deb-multimedia-keyring
+RUN apt-get update -y && apt-get install -y ffmpeg
 
 RUN apt-get update -qq && apt-get install -y \
     curl \
