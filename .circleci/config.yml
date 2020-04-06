@@ -41,17 +41,17 @@ jobs:
       - run:
           name: 下準備
           command: |
-            docker cp . project_image_search_1:/home/imagesearch
+            docker cp . image_search:/home/imagesearch
             docker-compose exec image_search bash -c 'cd /home/imagesearch && bundle install --path vendor/bundle'
             docker-compose exec image_search bash -c 'cd /home/imagesearch && yarn install --frozen-lockfile'
             mkdir -p /tmp/test-results
             curl -o wnjpn.db.gz http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz
             gzip -d wnjpn.db.gz
-            docker cp wnjpn.db project_image_search_1:/home/imagesearch/db/wnjpn.sqlite3
+            docker cp wnjpn.db image_search:/home/imagesearch/db/wnjpn.sqlite3
             echo $GCLOUD_SERVICE_KEY | tr -d ' ' | base64 --decode > tmp/googleapikey.json
-            docker cp tmp/googleapikey.json project_image_search_1:/home/imagesearch/vendor/gcs/googleapikey.json
-            docker cp project_image_search_1:/home/imagesearch/vendor/bundle vendor/bundle
-            docker cp project_image_search_1:/home/imagesearch/node_modules node_modules
+            docker cp tmp/googleapikey.json image_search:/home/imagesearch/vendor/gcs/googleapikey.json
+            docker cp image_search:/home/imagesearch/vendor/bundle vendor/bundle
+            docker cp image_search:/home/imagesearch/node_modules node_modules
 
       - save_cache:
           <<: *bundler_cache
@@ -64,8 +64,8 @@ jobs:
             docker-compose exec image_search bash -c 'cd /home/imagesearch && bundle exec rspec --format progress --format RspecJunitFormatter --out /tmp/test-results/rspec.xml'
             docker-compose exec image_search bash -c 'mkdir -p /home/imagesearch/tmp/screenshots'
             mkdir -p ~/test-results/rspec/
-            docker cp project_image_search_1:/tmp/test-results/rspec.xml ~/test-results/rspec/rspec.xml
-            docker cp project_image_search_1:/home/imagesearch/tmp/screenshots ~/test-results/screenshots
+            docker cp image_search:/tmp/test-results/rspec.xml ~/test-results/rspec/rspec.xml
+            docker cp image_search:/home/imagesearch/tmp/screenshots ~/test-results/screenshots
 
       - store_test_results:
           path: /home/circleci/test-results
@@ -93,9 +93,9 @@ jobs:
           command: |
             docker-compose exec image_search bash -c 'apt-get update'
             docker-compose exec image_search bash -c 'apt-get install -y nginx'
-            docker cp vendor/circleci/template/nginx/nginx.conf project_image_search_1:/etc/nginx/nginx.conf
+            docker cp vendor/circleci/template/nginx/nginx.conf image_search:/etc/nginx/nginx.conf
             docker-compose exec image_search bash -c 'mkdir -p /etc/nginx/sites'
-            docker cp vendor/circleci/template/nginx/imagesearch.conf project_image_search_1:/etc/nginx/sites/imagesearch.conf
+            docker cp vendor/circleci/template/nginx/imagesearch.conf image_search:/etc/nginx/sites/imagesearch.conf
 
       - run:
           name: ElasticSearchPush
