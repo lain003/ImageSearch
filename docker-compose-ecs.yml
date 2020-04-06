@@ -6,7 +6,15 @@ services:
       - "80:80"
     command: >
       bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production &&
-            nginx -g "daemon off;"'
+            nginx && exec /sbin/init'
+    privileged: true
+#    cap_add:
+#      - SYS_ADMIN
+#    security_opt:
+#      - seccomp:unconfined
+#    volumes:
+#      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
 #    logging:
 #      driver: awslogs
 #      options:
