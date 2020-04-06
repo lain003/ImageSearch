@@ -2,18 +2,14 @@ version: '3'
 services:
   image_search:
     image: lain003/release_image_search
+    container_name: image_search
     ports:
       - "80:80"
     command: >
       bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production &&
-            nginx && exec /sbin/init'
+            nginx && /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/imagesearch/vendor/ecs/cloudwatch/amazon-cloudwatch-agent.json &&
+            exec /sbin/init'
     privileged: true
-#    cap_add:
-#      - SYS_ADMIN
-#    security_opt:
-#      - seccomp:unconfined
-#    volumes:
-#      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
 #    logging:
 #      driver: awslogs
@@ -23,6 +19,7 @@ services:
 #        awslogs-stream-prefix: web
   elastic_search:
     image: lain003/release_elastic_search
+    container_name: elastic_search
     expose:
       - "9200"
       - "9300"

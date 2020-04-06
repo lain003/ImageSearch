@@ -83,6 +83,12 @@ jobs:
             docker-compose exec image_search bash -i -c 'cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production'
 
       - run:
+          name: CloudWatch Agent Install
+          command: |
+            docker-compose exec image_search bash -i -c 'wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb'
+            docker-compose exec image_search bash -i -c 'dpkg -i -E ./amazon-cloudwatch-agent.deb'
+
+      - run:
           name: Nginxインストール etc
           command: |
             docker-compose exec image_search bash -c 'apt-get update'
@@ -94,7 +100,7 @@ jobs:
       - run:
           name: ElasticSearchPush
           command: |
-            docker commit project_elastic_search_test_1 release_elastic_search
+            docker commit elastic_search_test release_elastic_search
             docker tag release_elastic_search lain003/release_elastic_search
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker push lain003/release_elastic_search
@@ -102,7 +108,7 @@ jobs:
       - run:
           name: ImagePush
           command: |
-            docker commit project_image_search_1 release_image_search
+            docker commit image_search release_image_search
             docker tag release_image_search lain003/release_image_search
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             docker push lain003/release_image_search
