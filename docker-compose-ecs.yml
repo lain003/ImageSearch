@@ -7,16 +7,13 @@ services:
       - "80:80"
     command: >
       bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production &&
-            nginx && /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/imagesearch/vendor/ecs/cloudwatch/amazon-cloudwatch-agent.json &&
-            exec /sbin/init'
-    privileged: true
-
-#    logging:
-#      driver: awslogs
-#      options:
-#        awslogs-group: imageSearch
-#        awslogs-region: ap-northeast-1
-#        awslogs-stream-prefix: web
+            nginx'
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: imageSearch
+        awslogs-region: ap-northeast-1
+        awslogs-stream-prefix: web
   elastic_search:
     image: lain003/release_elastic_search
     container_name: elastic_search
