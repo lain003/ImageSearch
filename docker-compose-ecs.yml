@@ -4,16 +4,9 @@ services:
     image: lain003/release_image_search
     container_name: image_search
     ports:
-      - "80:80"
+      - "3000:3000"
     command: >
-      bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production &&
-            nginx'
-    logging:
-      driver: awslogs
-      options:
-        awslogs-group: imageSearch
-        awslogs-region: ap-northeast-1
-        awslogs-stream-prefix: web
+      bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production'
   elastic_search:
     image: lain003/release_elastic_search
     container_name: elastic_search
@@ -23,3 +16,10 @@ services:
     environment:
       - cluster.name=develop-cluster
       - discovery.type=single-node
+  nginx:
+    image: lain003/release_image_search
+    container_name: nginx
+    ports:
+      - "80:80"
+    command: >
+      bash -c -i 'nginx -g "daemon off;"'

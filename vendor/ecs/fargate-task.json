@@ -13,7 +13,16 @@
         }
       ],
       "image": "lain003/release_elastic_search",
-      "name": "elastic_search"
+      "name": "elastic_search",
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "image_search",
+          "awslogs-region": "us-west-1",
+          "awslogs-stream-prefix": "elastic",
+          "awslogs-create-group": "true"
+        }
+      }
     },
     {
       "portMappings": [
@@ -33,7 +42,16 @@
         "credentialsParameter": "arn:aws:secretsmanager:ap-northeast-1:620988379686:secret:DockerHubLogin-NtgZPU"
       },
       "image": "lain003/release_image_search",
-      "name": "image_search"
+      "name": "image_search",
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "image_search",
+          "awslogs-region": "us-west-1",
+          "awslogs-stream-prefix": "rails",
+          "awslogs-create-group": "true"
+        }
+      }
     },
     {
       "portMappings": [
@@ -53,7 +71,16 @@
         "credentialsParameter": "arn:aws:secretsmanager:ap-northeast-1:620988379686:secret:DockerHubLogin-NtgZPU"
       },
       "image": "lain003/release_image_search",
-      "name": "nginx"
+      "name": "nginx",
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "image_search",
+          "awslogs-region": "us-west-1",
+          "awslogs-stream-prefix": "nginx",
+          "awslogs-create-group": "true"
+        }
+      }
     }
   ],
   "family": "customImageSearch",
@@ -61,6 +88,6 @@
     "FARGATE"
   ],
   "networkMode": "awsvpc",
-  "cpu": "512",
-  "memory": "3072"
+  "cpu": "1024",
+  "memory": "8192"
 }
