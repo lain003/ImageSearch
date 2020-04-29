@@ -92,7 +92,7 @@ jobs:
           name: Nginxコンテナ作成
           command: |
             docker image pull nginx
-            docker container run --name nginx01 nginx
+            docker container run -d --name nginx01 nginx
             docker cp vendor/circleci/template/nginx/nginx.conf nginx01:/etc/nginx/nginx.conf
             docker exec nginx01 mkdir /etc/nginx/sites
             docker cp vendor/circleci/template/nginx/imagesearch.conf nginx01:/etc/nginx/sites/imagesearch.conf
