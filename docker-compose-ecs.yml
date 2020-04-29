@@ -17,9 +17,7 @@ services:
       - cluster.name=develop-cluster
       - discovery.type=single-node
   nginx:
-    image: lain003/release_image_search
+    image: lain003/release_nginx
     container_name: nginx
     ports:
       - "80:80"
-    command: >
-      bash -c -i 'nginx -g "daemon off;"'

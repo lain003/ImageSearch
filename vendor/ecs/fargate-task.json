@@ -61,16 +61,7 @@
           "containerPort": 80
         }
       ],
-      "command": [
-        "bash",
-        "-c",
-        "-i",
-        "nginx -g \"daemon off;\""
-      ],
-      "repositoryCredentials": {
-        "credentialsParameter": "arn:aws:secretsmanager:ap-northeast-1:620988379686:secret:DockerHubLogin-NtgZPU"
-      },
-      "image": "lain003/release_image_search",
+      "image": "lain003/release_nginx",
       "name": "nginx",
       "logConfiguration": {
         "logDriver": "awslogs",
