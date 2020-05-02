@@ -7,6 +7,8 @@ services:
       - "3000:3000"
     command: >
       bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production'
+    environment:
+      - RAILS_LOG_TO_STDOUT=true
   elastic_search:
     image: lain003/release_elastic_search
     container_name: elastic_search

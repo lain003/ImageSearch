@@ -41,6 +41,12 @@
       "repositoryCredentials": {
         "credentialsParameter": "arn:aws:secretsmanager:ap-northeast-1:620988379686:secret:DockerHubLogin-NtgZPU"
       },
+      "environment": [
+        {
+          "name": "RAILS_LOG_TO_STDOUT",
+          "value": "true"
+        }
+      ],
       "image": "lain003/release_image_search",
       "name": "image_search",
       "logConfiguration": {
