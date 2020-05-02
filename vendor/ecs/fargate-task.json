@@ -36,7 +36,7 @@
         "bash",
         "-c",
         "-i",
-        "cd /home/imagesearch && bundle exec rails s -e production"
+        "cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production && bundle exec rails s -e production"
       ],
       "repositoryCredentials": {
         "credentialsParameter": "arn:aws:secretsmanager:ap-northeast-1:620988379686:secret:DockerHubLogin-NtgZPU"

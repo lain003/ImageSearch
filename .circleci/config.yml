@@ -96,6 +96,11 @@ jobs:
             docker cp vendor/circleci/template/nginx/nginx.conf nginx01:/etc/nginx/nginx.conf
             docker exec nginx01 mkdir /etc/nginx/sites
             docker cp vendor/circleci/template/nginx/imagesearch.conf nginx01:/etc/nginx/sites/imagesearch.conf
+
+            docker cp image_search:/home/imagesearch/public ./public
+            docker exec nginx01 mkdir /home/imagesearch
+            docker cp ./public nginx01:/home/imagesearch
+
             docker commit nginx01 release_nginx
             docker tag release_nginx lain003/release_nginx
             docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
