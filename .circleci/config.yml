@@ -80,13 +80,13 @@ jobs:
             docker-compose exec image_search bash -i -c 'cd /home/imagesearch && bundle exec rake assets:precompile RAILS_ENV=production'
             docker-compose exec image_search bash -i -c 'cd /home/imagesearch && yarn install --frozen-lockfile'
             docker-compose exec image_search bash -i -c 'wget https://imageupload-z321.s3-ap-northeast-1.amazonaws.com/development.sqlite3 -O /home/imagesearch/db/production.sqlite3'
-            docker-compose exec image_search bash -i -c 'cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production'
+# docker-compose exec image_search bash -i -c 'cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production'
 
-      - run:
-          name: CloudWatch Agent Install
-          command: |
-            docker-compose exec image_search bash -i -c 'wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb'
-            docker-compose exec image_search bash -i -c 'dpkg -i -E ./amazon-cloudwatch-agent.deb'
+#      - run:
+#          name: CloudWatch Agent Install
+#          command: |
+#            docker-compose exec image_search bash -i -c 'wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb'
+#            docker-compose exec image_search bash -i -c 'dpkg -i -E ./amazon-cloudwatch-agent.deb'
 
       - run:
           name: Nginxコンテナ作成
