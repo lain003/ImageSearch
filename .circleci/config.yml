@@ -101,7 +101,6 @@ jobs:
           name: 下準備
           <<: *build
 
-      # ここからmaster
       - run:
           name: SECRET_KEY_BASEとassetsとseed
           command: |
