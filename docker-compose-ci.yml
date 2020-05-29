@@ -1,6 +1,7 @@
 version: "3.7"
 services:
-  elastic_search_development:
+  elastic_search_test:
+    container_name: elastic_search_test
     build:
       context: .
       dockerfile: ElasticsearchDockerFile
@@ -8,9 +9,10 @@ services:
       - "9200"
       - "9300"
     environment:
-      - cluster.name=develop-cluster
+      - cluster.name=test-cluster
       - discovery.type=single-node
-  elastic_search_test:
+  elastic_search:
+    container_name: elastic_search
     build:
       context: .
       dockerfile: ElasticsearchDockerFile
@@ -21,17 +23,11 @@ services:
       - cluster.name=test-cluster
       - discovery.type=single-node
   image_search:
+    container_name: image_search
     build:
       context: .
       dockerfile: ImageSearchDockerFile
     ports:
       - "3000:3000"
       - "1234:1234"
-    volumes:
-      - .:/home/imagesearch
-      - bundle-data:/usr/local/bundle/
     tty: true
-
-
-volumes:
-  bundle-data:

@@ -1,8 +1,11 @@
-FROM ruby:2.5.5-slim-stretch
+FROM debian:8.11-slim
 ENV LANG C.UTF-8
-ENV PATH /bundle/bin:$PATH
-
+ENV PATH /root/.rbenv/shims:$PATH
 RUN mkdir -p /usr/share/man/man1
+
+RUN sed -i -e "$ a deb http://www.deb-multimedia.org jessie main non-free\ndeb-src http://www.deb-multimedia.org jessie main non-free\n" /etc/apt/sources.list
+RUN apt-get update -y && yes | apt-get install deb-multimedia-keyring
+RUN apt-get update -y && yes | apt-get install ffmpeg
 
 RUN apt-get update -qq && apt-get install -y \
     curl \
@@ -10,16 +13,32 @@ RUN apt-get update -qq && apt-get install -y \
     build-essential \
     zlib1g-dev \
     default-jre \
-    default-libmysqlclient-dev \
+    mysql-client \
+    libmysqlclient-dev \
     libsqlite3-dev \
     mecab \
     mecab-ipadic-utf8 \
     lsof \
-    ffmpeg \
     wget \
     fonts-indic \
     fonts-noto \
-    fonts-noto-cjk
+#    fonts-noto-cjk \
+    bzip2 \
+    libssl-dev \
+    libreadline-dev \
+    gcc \
+    make \
+    tar
+
+RUN wget -O /tmp/ruby2.5.7.tar.gz https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.7.tar.gz
+RUN tar -xvzf /tmp/ruby2.5.7.tar.gz -C /tmp/
+
+RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+RUN echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+RUN echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+RUN git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+RUN /root/.rbenv/bin/rbenv install 2.5.8
+RUN /root/.rbenv/bin/rbenv global 2.5.8
 
 RUN sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
@@ -32,12 +51,9 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 RUN apt-get update && apt-get install yarn
 
-ENV MECAB_PATH /usr/lib/x86_64-linux-gnu/libmecab.so.2
+ENV MECAB_PATH /usr/lib/libmecab.so.2
 
 ENV imagesearch_root /home/imagesearch
 RUN mkdir ${imagesearch_root}
-WORKDIR ${imagesearch_root}
-ADD Gemfile .
-ADD Gemfile.lock .
-RUN bundle install
-#RUN rake elastic_seed:run
+
+RUN /root/.rbenv/shims/gem install bundler

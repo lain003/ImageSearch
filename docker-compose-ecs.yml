@@ -1,0 +1,25 @@
+version: '3'
+services:
+  image_search:
+    image: lain003/release_image_search
+    container_name: image_search
+    ports:
+      - "3000:3000"
+    command: >
+      bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production'
+    environment:
+      - RAILS_LOG_TO_STDOUT=true
+  elastic_search:
+    image: lain003/release_elastic_search
+    container_name: elastic_search
+    expose:
+      - "9200"
+      - "9300"
+    environment:
+      - cluster.name=develop-cluster
+      - discovery.type=single-node
+  nginx:
+    image: lain003/release_nginx
+    container_name: nginx
+    ports:
+      - "80:80"

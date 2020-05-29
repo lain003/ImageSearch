@@ -7,9 +7,9 @@ RSpec.feature 'MetaFramesIndex', type: :system, js: true, elasticsearch: true do
 
   before(:each) do
     allow_any_instance_of(MetaFrame).to receive(:image_url)
-                                            .and_return('http://image.imagesearch.biz/Chuunibyou/1/2/screenshot/15335.jpg')
+      .and_return('http://image.imagesearch.biz/Chuunibyou/1/2/screenshot/15335.jpg')
     allow_any_instance_of(MetaFrame).to receive(:gif_url)
-                                            .and_return('http://image.imagesearch.biz/Chuunibyou/1/2/gif/15335.gif')
+      .and_return('http://image.imagesearch.biz/Chuunibyou/1/2/gif/15335.gif')
   end
 
   scenario 'デフォルトでは「ようこそ」の検索結果が表示される' do

@@ -7,7 +7,7 @@ end
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.1.4'
+gem 'rails', '~> 5.2.4'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 # Use Puma as the app server
@@ -84,8 +84,9 @@ gem 'mysql2'
 
 gem 'kaminari'
 
-gem 'elasticsearch-model'
-gem 'elasticsearch-rails'
+# https://ulab.hatenablog.com/entry/20191013/1570930332と同じエラーが出た為、version down
+gem 'elasticsearch-model', git: 'https://github.com/elastic/elasticsearch-rails.git', branch: '6.x'
+gem 'elasticsearch-rails', git: 'https://github.com/elastic/elasticsearch-rails.git', branch: '6.x'
 
 gem 'config'
 

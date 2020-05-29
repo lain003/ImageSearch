@@ -32,7 +32,7 @@ config/environments/*.local.yml
 public/sitemap.xml.gz
 
 /resource/image/
-
+/vendor/ecs/docker-hub.json
 .DS_Store
 
 vendor/gcs/googleapikey.json
