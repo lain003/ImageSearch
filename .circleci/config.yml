@@ -8,6 +8,19 @@ references:
   bundler_cache: &bundler_cache
     key: gem-cache-v2-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
     paths: vendor/bundle
+  build: &build
+    command: |
+      docker cp . image_search:/home/imagesearch
+      docker-compose exec image_search bash -c 'cd /home/imagesearch && bundle install --path vendor/bundle'
+      docker-compose exec image_search bash -c 'cd /home/imagesearch && yarn install --frozen-lockfile'
+      mkdir -p /tmp/test-results
+      curl -o wnjpn.db.gz http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz
+      gzip -d wnjpn.db.gz
+      docker cp wnjpn.db image_search:/home/imagesearch/db/wnjpn.sqlite3
+      echo $GCLOUD_SERVICE_KEY | tr -d ' ' | base64 --decode > tmp/googleapikey.json
+      docker cp tmp/googleapikey.json image_search:/home/imagesearch/vendor/gcs/googleapikey.json
+      docker cp image_search:/home/imagesearch/vendor/bundle vendor/bundle
+      docker cp image_search:/home/imagesearch/node_modules node_modules
 
 jobs:
   rspec:
@@ -40,18 +53,7 @@ jobs:
 
       - run:
           name: 下準備
-          command: |
-            docker cp . image_search:/home/imagesearch
-            docker-compose exec image_search bash -c 'cd /home/imagesearch && bundle install --path vendor/bundle'
-            docker-compose exec image_search bash -c 'cd /home/imagesearch && yarn install --frozen-lockfile'
-            mkdir -p /tmp/test-results
-            curl -o wnjpn.db.gz http://compling.hss.ntu.edu.sg/wnja/data/1.1/wnjpn.db.gz
-            gzip -d wnjpn.db.gz
-            docker cp wnjpn.db image_search:/home/imagesearch/db/wnjpn.sqlite3
-            echo $GCLOUD_SERVICE_KEY | tr -d ' ' | base64 --decode > tmp/googleapikey.json
-            docker cp tmp/googleapikey.json image_search:/home/imagesearch/vendor/gcs/googleapikey.json
-            docker cp image_search:/home/imagesearch/vendor/bundle vendor/bundle
-            docker cp image_search:/home/imagesearch/node_modules node_modules
+          <<: *build
 
       - save_cache:
           <<: *bundler_cache
@@ -72,6 +74,33 @@ jobs:
       - store_artifacts:
           path: /home/circleci/test-results/screenshots
 
+  deploy:
+    docker:
+      - image: circleci/ruby:2.7.0-buster
+        environment:
+          DOCKER_API_VERSION: 1.39
+    steps:
+      - checkout
+
+      - run:
+          name: Docker Compose をインストール
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.25.4/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+
+      - setup_remote_docker:
+          docker_layer_caching: false # 有料プランならtrue
+
+      - run:
+          name: docker-compose up
+          command: |
+            docker-compose -f docker-compose-ci.yml up -d
+
+      - run:
+          name: 下準備
+          <<: *build
+
       # ここからmaster
       - run:
           name: SECRET_KEY_BASEとassetsとseed
@@ -80,13 +109,6 @@ jobs:
             docker-compose exec image_search bash -i -c 'cd /home/imagesearch && bundle exec rake assets:precompile RAILS_ENV=production'
             docker-compose exec image_search bash -i -c 'cd /home/imagesearch && yarn install --frozen-lockfile'
             docker-compose exec image_search bash -i -c 'wget https://imageupload-z321.s3-ap-northeast-1.amazonaws.com/development.sqlite3 -O /home/imagesearch/db/production.sqlite3'
-# docker-compose exec image_search bash -i -c 'cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production'
-
-#      - run:
-#          name: CloudWatch Agent Install
-#          command: |
-#            docker-compose exec image_search bash -i -c 'wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb'
-#            docker-compose exec image_search bash -i -c 'dpkg -i -E ./amazon-cloudwatch-agent.deb'
 
       - run:
           name: Nginxコンテナ作成
@@ -127,3 +149,9 @@ workflows:
   test:
     jobs:
       - rspec
+      - deploy:
+          requires:
+            - rspec
+          filters:
+            branches:
+              only: master
