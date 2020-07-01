@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  ECSServiceVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+  ECSServiceSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ECSServiceVpc
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: ap-northeast-1a
+      MapPublicIpOnLaunch: true
+  ALBDummySubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ECSServiceVpc
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: ap-northeast-1c
+      MapPublicIpOnLaunch: true
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref ECSServiceVpc
+  PublicRouteTableA:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ECSServiceVpc
+  PublicRouteA:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTableA
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref InternetGateway
+  PublicSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref ECSServiceSubnet
+      RouteTableId: !Ref PublicRouteTableA
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref ECSServiceVpc
+      Name: "ImageSearchTargetGroup"
+      Protocol: HTTP
+      Port: 80
+      TargetType: ip
+  ECSALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "ECSALBSecurityGroup"
+      GroupDescription: "-"
+      VpcId: !Ref ECSServiceVpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+  ECSALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: "ImageSearchAlb"
+      Scheme: "internet-facing"
+      SecurityGroups:
+        - !Ref ECSALBSecurityGroup
+      Subnets:
+        - !Ref ECSServiceSubnet
+        - !Ref ALBDummySubnet
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref ECSALB
+      Port: 80
+      Protocol: HTTP
+#  HostZone: #CloudFlareで設定するので要らないけどドキュメント用に。なおCloudFlare側でAレコードをALBに設定する事
+#    Type: AWS::Route53::HostedZone
+#    Properties:
+#      Name: imagesearch.biz
+#  RecordSetA:
+#    Type: AWS::Route53::RecordSet
+#    Properties:
+#      HostedZoneId: !Ref HostZone
+#      Name: imagesearch.biz.
+#      Type: A
+#      AliasTarget:
+#        DNSName: !GetAtt 'ECSALB.DNSName'
+#        HostedZoneId: !GetAtt 'ECSALB.CanonicalHostedZoneID'
+#  RecordSetCNAME:
+#    Type: AWS::Route53::RecordSetGroup
+#    Properties:
+#      HostedZoneId: !Ref HostZone
+#      RecordSets:
+#        - Name: image.imagesearch.biz.
+#          Type: CNAME
+#          TTL: '900'
+#          ResourceRecords:
+#            - c.storage.googleapis.com
+# ドメインを新規で取得した場合は、ネームサーバを以下のアドレスに
+# noel.ns.cloudflare.com
+# grace.ns.cloudflare.com
+Outputs:
+  ECSVpc:
+    Value: !Ref ECSServiceVpc
+    Export:
+      Name: network:ECSServiceVpc
+  ECSSubnet:
+    Value: !Ref ECSServiceSubnet
+    Export:
+      Name: network:ECSServiceSubnet
+  TargetGroup:
+    Value: !Ref TargetGroup
+    Export:
+      Name: network:TargetGroup
+  ALBListener:
+    Value: !Ref ALBListener
+    Export:
+      Name: network:ALBListener
