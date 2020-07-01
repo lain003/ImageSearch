@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  SecretsmanagerArn:
+    Type: String
+Resources:
+  ECSTask:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      ExecutionRoleArn: !ImportValue security:ECSTaskRole
+      ContainerDefinitions:
+        - Environment:
+            - Name: cluster.name
+              Value: develop-cluster
+            - Name: discovery.type
+              Value: single-node
+          Image: lain003/release_elastic_search
+          Name: elastic_search
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: image_search
+              awslogs-region: us-west-1
+              awslogs-stream-prefix: elastic
+              awslogs-create-group: 'true'
+        - PortMappings:
+            - HostPort: 3000
+              Protocol: tcp
+              ContainerPort: 3000
+          Command:
+            - bash
+            - "-c"
+            - "-i"
+            - cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production
+              && bundle exec rails s -e production
+          RepositoryCredentials:
+            CredentialsParameter:
+              Ref: SecretsmanagerArn
+          Environment:
+            - Name: RAILS_LOG_TO_STDOUT
+              Value: 'true'
+          Image: lain003/release_image_search
+          Name: image_search
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: image_search
+              awslogs-region: us-west-1
+              awslogs-stream-prefix: rails
+              awslogs-create-group: 'true'
+        - PortMappings:
+            - HostPort: 80
+              Protocol: tcp
+              ContainerPort: 80
+          Image: lain003/release_nginx
+          Name: nginx
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: image_search
+              awslogs-region: us-west-1
+              awslogs-stream-prefix: nginx
+              awslogs-create-group: 'true'
+      Family: cfnImageSearch
+      RequiresCompatibilities:
+        - FARGATE
+      NetworkMode: awsvpc
+      Cpu: '1024'
+      Memory: '8192'
+  ECSCluster:
+    Type: "AWS::ECS::Cluster"
+    Properties:
+      ClusterName: cfn-cluster
+  ECSService:
+    Type: "AWS::ECS::Service"
+    Properties:
+      Cluster: !Ref ECSCluster
+      ServiceName: "cfn-service"
+      TaskDefinition: !Ref ECSTask
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !ImportValue security:ECSServiceSecurityGroup
+          Subnets:
+            - !ImportValue network:ECSServiceSubnet
+      DesiredCount: 1
+      LoadBalancers:
+        - TargetGroupArn: !ImportValue network:TargetGroup
+          ContainerName: nginx
+          ContainerPort: 80
