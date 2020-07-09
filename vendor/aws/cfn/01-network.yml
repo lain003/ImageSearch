@@ -40,6 +40,11 @@ Resources:
     Properties:
       SubnetId: !Ref ECSServiceSubnet
       RouteTableId: !Ref PublicRouteTableA
+  ALBDummySubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref ALBDummySubnet
+      RouteTableId: !Ref PublicRouteTableA
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
