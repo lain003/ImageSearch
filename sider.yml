@@ -4,7 +4,7 @@
    rubocop:
      gems:
        - "rubocop-rspec"
-     config: "config/.rubocop.yml"
+     config: ".rubocop.yml"
 
 #   # https://help.sider.review/tools/ruby/brakeman
 #   brakeman:
