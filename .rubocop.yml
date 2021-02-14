@@ -1,0 +1,8 @@
+require:
+  - rubocop-rails
+
+AllCops:
+  Exclude:
+    - 'db/**/*'
+    - 'node_modules/**/*'
+    - 'bin/**/*'
