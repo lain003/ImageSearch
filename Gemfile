@@ -60,7 +60,7 @@ group :development, :test do
   gem 'ruby-debug-ide'
 
   gem 'rubocop'
-  gem 'rubocop-rails', require: false
+  gem 'rubocop-rails'
 
   gem 'rails-controller-testing'
 
