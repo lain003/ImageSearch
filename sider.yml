@@ -3,8 +3,8 @@
    # https://help.sider.review/tools/ruby/rubocop
    rubocop:
     gems:
+      - "rubocop-rails"
       - "rubocop-rspec"
-      - name: "rubocop-rspec"
 
 #   # https://help.sider.review/tools/ruby/brakeman
 #   brakeman:
