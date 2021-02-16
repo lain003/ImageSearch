@@ -1,6 +1,10 @@
 require:
   - rubocop-rails
-
+Metrics/LineLength:
+  Max: 100
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
 AllCops:
   Exclude:
     - 'db/**/*'
