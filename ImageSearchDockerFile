@@ -5,7 +5,6 @@ RUN mkdir -p /usr/share/man/man1
 
 RUN sed -i -e "$ a deb http://www.deb-multimedia.org jessie main non-free\ndeb-src http://www.deb-multimedia.org jessie main non-free\n" /etc/apt/sources.list
 RUN apt-get update -y && yes | apt-get install deb-multimedia-keyring
-RUN apt-get update -y && yes | apt-get install ffmpeg
 
 RUN apt-get update -qq && apt-get install -y \
     curl \
@@ -28,7 +27,21 @@ RUN apt-get update -qq && apt-get install -y \
     libreadline-dev \
     gcc \
     make \
-    tar
+    tar \
+    imagemagick \
+    pngquant
+
+#ffmpeg install
+RUN wget https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-4.2.2-arm64-static.tar.xz
+RUN tar Jxfv ffmpeg-4.2.2-arm64-static.tar.xz -C /tmp
+RUN mv /tmp/ffmpeg-4.2.2-arm64-static/ffprobe /usr/bin/
+RUN mv /tmp/ffmpeg-4.2.2-arm64-static/ffmpeg /usr/bin/
+
+##gifsicle install
+RUN wget -O /tmp/gifsicle-1.92.tar.gz https://www.lcdf.org/gifsicle/gifsicle-1.92.tar.gz
+RUN tar -xvzf /tmp/gifsicle-1.92.tar.gz -C /tmp
+RUN cd /tmp/gifsicle-1.92 && ./configure && make
+RUN cd /tmp/gifsicle-1.92 && make install
 
 RUN wget -O /tmp/ruby2.5.7.tar.gz https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.7.tar.gz
 RUN tar -xvzf /tmp/ruby2.5.7.tar.gz -C /tmp/

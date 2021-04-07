@@ -5,6 +5,7 @@ class CreateMetaFrames < ActiveRecord::Migration[5.1]
       t.float :start_sec, null: false
       t.float :end_sec, null: false
       t.string :text, null: false
+      t.integer :image_num, null: false
 
       t.timestamps
     end

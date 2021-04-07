@@ -59,8 +59,10 @@ group :development, :test do
   gem 'debase'
   gem 'ruby-debug-ide'
 
-  gem 'rubocop'
+  gem 'regexp_parser', '>= 1.8'
+  gem 'rubocop', '~> 1.10', require: false
   gem 'rubocop-rails', require: false
+  gem 'rubocop-rspec', require: false
 
   gem 'rails-controller-testing'
 

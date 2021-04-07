@@ -9,14 +9,14 @@ Resources:
     Properties:
       VpcId: !Ref ECSServiceVpc
       CidrBlock: 10.0.1.0/24
-      AvailabilityZone: ap-northeast-1a
+      AvailabilityZone: us-east-1a
       MapPublicIpOnLaunch: true
   ALBDummySubnet:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref ECSServiceVpc
       CidrBlock: 10.0.2.0/24
-      AvailabilityZone: ap-northeast-1c
+      AvailabilityZone: us-east-1b
       MapPublicIpOnLaunch: true
   InternetGateway:
     Type: AWS::EC2::InternetGateway

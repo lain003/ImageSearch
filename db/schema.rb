@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180905180150) do
+ActiveRecord::Schema.define(version: 2018_09_05_180150) do
 
   create_table "edited_gifs", force: :cascade do |t|
     t.string "file_name"
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 20180905180150) do
     t.float "start_sec", null: false
     t.float "end_sec", null: false
     t.string "text", null: false
+    t.integer "image_num", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["movie_id"], name: "index_meta_frames_on_movie_id"

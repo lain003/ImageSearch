@@ -30,8 +30,8 @@ Resources:
             - bash
             - "-c"
             - "-i"
-            - cd /home/imagesearch && bundle exec rake elastic_seed:run RAILS_ENV=production
-              && bundle exec rails s -e production
+            - cd /home/imagesearch && bundle exec rake ocrtest:register_imageinfo RAILS_ENV=production &&
+              bundle exec rake elastic_seed:run RAILS_ENV=production && bundle exec rails s -e production
           RepositoryCredentials:
             CredentialsParameter:
               Ref: SecretsmanagerArn
