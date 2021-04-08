@@ -47,11 +47,9 @@ class CreateForm
 
   def cut_gif(meta_frame, local_path)
     FileUtils.mkdir_p('tmp/edited_gif') unless File.exist?('tmp/edited_gif')
-    command = "wget http://#{Settings.bucket_name}/#{meta_frame.cloud_gif_path}"
-    `#{command}`
-    command = "yes | ffmpeg -i #{meta_frame.image_num}.gif -vf \"trim=start_frame=#{start_frame}:end_frame=#{end_frame + 1},setpts=PTS-STARTPTS,scale=640:-1,split[a][b];[a]palettegen[pal];[b][pal]paletteuse\" #{local_path}"
-    `#{command}`
-    command = "rm #{meta_frame.image_num}.gif"
-    `#{command}`
+    system('wget', "http://#{Settings.bucket_name}/#{meta_frame.cloud_gif_path}")
+    option = "trim=start_frame=#{start_frame}:end_frame=#{end_frame + 1},setpts=PTS-STARTPTS,scale=640:-1,split[a][b];[a]palettegen[pal];[b][pal]paletteuse"
+    system('ffmpeg', '-i', "#{meta_frame.image_num}.gif", '-vf', option, local_path)
+    system('rm', "#{meta_frame.image_num}.gif")
   end
 end

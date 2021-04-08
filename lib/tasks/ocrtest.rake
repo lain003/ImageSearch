@@ -91,8 +91,7 @@ namespace :ocrtest do # rubocop:disable Metrics/BlockLength
       sub_index = get_index_jp_subtitle(mkv_path)
       local_file_name = "#{work_folder}/#{paths[4].to_i}.gif"
 
-      command = "yes | ffmpeg -ss #{file.metadata['start_sec'].to_f - 1} -t 5 -i #{mkv_path} -filter_complex \"[0:v][0:#{sub_index}]overlay,scale=640:-1,split[a][b];[a]palettegen[pal];[b][pal]paletteuse\" -r 10 #{local_file_name}"
-      `#{command}`
+      `yes | ffmpeg -ss #{file.metadata['start_sec'].to_f - 1} -t 5 -i #{mkv_path} -filter_complex "[0:v][0:#{sub_index}]overlay,scale=640:-1,split[a][b];[a]palettegen[pal];[b][pal]paletteuse" -r 10 #{local_file_name}`
 
       local_eco_file_name = "#{work_folder}/#{paths[4].to_i}-eco.gif"
       command = "gifsicle #{local_file_name} --lossy=100 > #{local_eco_file_name}"
@@ -164,8 +163,7 @@ def union_and_upload(buffer_imageinfos, bucket, union_sup_png_path, gcs_sup_png_
   file_names = buffer_imageinfos.map { |file| file.path.to_s }
   files_string = file_names.join(' ')
   space = 40
-  command = "convert -append #{files_string} -background none -splice 0x#{space} #{local_file_path}"
-  `#{command}`
+  `convert -append #{files_string} -background none -splice 0x#{space} #{local_file_path}`
 
   meta_data = {}
   base_names = buffer_imageinfos.map { |file| file.path.basename.to_s }
