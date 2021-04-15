@@ -48,7 +48,7 @@ class MetaFramesController < ApplicationController
   end
 
   def words_params
-    return ['ようこそ'] if params[:words].blank?
+    return ['了解'] if params[:words].blank?
 
     word = params[:words]
     word.split(/[[:blank:]]+/)
