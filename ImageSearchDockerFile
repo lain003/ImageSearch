@@ -1,11 +1,7 @@
-FROM debian:8.11-slim
+FROM debian:9
 ENV LANG C.UTF-8
 ENV PATH /root/.rbenv/shims:$PATH
 RUN mkdir -p /usr/share/man/man1
-
-RUN sed -i -e "$ a deb http://www.deb-multimedia.org jessie main non-free\ndeb-src http://www.deb-multimedia.org jessie main non-free\n" /etc/apt/sources.list
-RUN apt-get update -y && yes | apt-get install deb-multimedia-keyring
-RUN apt-get update -y && yes | apt-get install ffmpeg
 
 RUN apt-get update -qq && apt-get install -y \
     curl \
@@ -14,7 +10,6 @@ RUN apt-get update -qq && apt-get install -y \
     zlib1g-dev \
     default-jre \
     mysql-client \
-    libmysqlclient-dev \
     libsqlite3-dev \
     mecab \
     mecab-ipadic-utf8 \
@@ -26,32 +21,54 @@ RUN apt-get update -qq && apt-get install -y \
     bzip2 \
     libssl-dev \
     libreadline-dev \
-    gcc \
     make \
-    tar
+    tar \
+    imagemagick \
+    pngquant \
+    default-libmysqlclient-dev
 
-RUN wget -O /tmp/ruby2.5.7.tar.gz https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.7.tar.gz
-RUN tar -xvzf /tmp/ruby2.5.7.tar.gz -C /tmp/
+# gccのインストール apt-getで入れたら恐らくversionが古すぎて、mini_racerでエラーになったため
+RUN wget -O /tmp/gcc-8.3.0.tar.gz http://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-8.3.0/gcc-8.3.0.tar.gz
+RUN tar zxf /tmp/gcc-8.3.0.tar.gz -C /tmp
+RUN cd /tmp/gcc-8.3.0 && ./contrib/download_prerequisites
+RUN cd /tmp/gcc-8.3.0 && ./configure --disable-multilib
+RUN cd /tmp/gcc-8.3.0 && make -j 4
+RUN cd /tmp/gcc-8.3.0 && make install
+
+#ffmpeg install
+RUN wget https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-4.2.2-arm64-static.tar.xz
+RUN tar Jxfv ffmpeg-4.2.2-arm64-static.tar.xz -C /tmp
+RUN mv /tmp/ffmpeg-4.2.2-arm64-static/ffprobe /usr/bin/
+RUN mv /tmp/ffmpeg-4.2.2-arm64-static/ffmpeg /usr/bin/
+
+##gifsicle install
+RUN wget -O /tmp/gifsicle-1.92.tar.gz https://www.lcdf.org/gifsicle/gifsicle-1.92.tar.gz
+RUN tar -xvzf /tmp/gifsicle-1.92.tar.gz -C /tmp
+RUN cd /tmp/gifsicle-1.92 && ./configure && make
+RUN cd /tmp/gifsicle-1.92 && make install
+
+#RUN wget -O /tmp/ruby2.7.3.tar.gz https://cache.ruby-lang.org/pub/ruby/2.7/ruby-2.7.3.tar.gz
+#RUN tar -xvzf /tmp/ruby2.7.3.tar.gz -C /tmp/
 
 RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv
 RUN echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
 RUN echo 'eval "$(rbenv init -)"' >> ~/.bashrc
 RUN git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
-RUN /root/.rbenv/bin/rbenv install 2.5.8
-RUN /root/.rbenv/bin/rbenv global 2.5.8
+RUN /root/.rbenv/bin/rbenv install 2.7.3
+RUN /root/.rbenv/bin/rbenv global 2.7.3
 
 RUN sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
 RUN apt-get update -qq && apt-get install -y google-chrome-stable
 
 ## webpack
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-RUN apt-get install -y nodejs
+RUN curl -fsSL https://deb.nodesource.com/setup_13.x | bash - #node14.9.0以降のバージョンがCircleCI上のDockerに対応していない為
+RUN apt-get --yes --force-yes install nodejs
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 RUN apt-get update && apt-get install yarn
 
-ENV MECAB_PATH /usr/lib/libmecab.so.2
+ENV MECAB_PATH /usr/lib/x86_64-linux-gnu/libmecab.so.2
 
 ENV imagesearch_root /home/imagesearch
 RUN mkdir ${imagesearch_root}

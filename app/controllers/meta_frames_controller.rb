@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 class MetaFramesController < ApplicationController
-  def index
+  def index # rubocop:disable Metrics/MethodLength
     words = words_params
     @search_form = SearchForm.new(words: words, page: params[:page])
     @meta_frames = @search_form.search
     @view_meta_frames = convert_view_metaframe(@meta_frames)
     @example_words = Settings.example_words
     @search_words = words.join(' ')
-    title = @search_words + 'の検索結果'
+    title = "#{@search_words}の検索結果"
     @html_meta = HTMLMeta.new(title: title, description: title)
     @image_paths = { twitter: view_context.image_path('twitter.png'),
                      loading: view_context.image_path('loading.gif') }
@@ -48,7 +48,7 @@ class MetaFramesController < ApplicationController
   end
 
   def words_params
-    return ['ようこそ'] unless params[:words].present?
+    return ['了解'] if params[:words].blank?
 
     word = params[:words]
     word.split(/[[:blank:]]+/)
@@ -59,15 +59,14 @@ class SearchForm
   include ActiveModel::Model
 
   attr_accessor :words, :page
+
   validate :custom_validate
 
   def custom_validate
     return if words.blank?
 
     words.each do |word|
-      unless word =~ /\A[ぁ-んァ-ンーa-zA-Z0-9一-龠０-９\-\r]+\z/
-        errors.add(:words, '記号は入力できません')
-      end
+      errors.add(:words, '記号は入力できません') unless word =~ /\A[ぁ-んァ-ンーa-zA-Z0-9一-龠０-９\-\r]+\z/
     end
   end
 

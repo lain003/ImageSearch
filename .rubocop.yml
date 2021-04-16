@@ -1,11 +1,23 @@
 require:
   - rubocop-rails
+  - rubocop-rspec
 Layout/LineLength:
-  Max: 100
+  Enabled: false
+Documentation:
+  Enabled: false
+Naming/MethodParameterName:
+  Enabled: false
+Metrics/MethodLength:
+  Max: 15
+Metrics/AbcSize:
+  Max: 20
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
+RSpec/ExampleLength:
+  Max: 10
 AllCops:
+  NewCops: enable
   Exclude:
     - 'db/**/*'
     - 'node_modules/**/*'

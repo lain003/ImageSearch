@@ -6,9 +6,9 @@ class MetaFrame extends React.Component {
   render () {
     const head_path = location.protocol + "//" + location.hostname;
     const twitter_path = "https://twitter.com/share?text=&url="
-      + head_path + Routes.meta_frame_path(this.props.meta_frame.id);
+      + head_path + "/meta_frames/" + this.props.meta_frame.id;
     const image_path = "https://twitter.com/share?text=&url="
-      + head_path + Routes.meta_frame_gif_path(this.props.meta_frame.id);
+      + head_path + this.props.meta_frame.gif_path;
     return (
       <React.Fragment>
         <div className="col-lg-6 meta-frame" test_data={this.props.meta_frame.id}>

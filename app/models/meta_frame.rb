@@ -19,7 +19,7 @@ require 'google/cloud/storage'
 module Searchable
   extend ActiveSupport::Concern
 
-  included do
+  included do # rubocop:disable Metrics/BlockLength
     include Elasticsearch::Model
 
     settings index: {
@@ -41,8 +41,8 @@ module Searchable
             tokenizer: 'ja_normal_tokenizer'
           },
           base_form_analyzer: {
-            "tokenizer": 'kuromoji_tokenizer',
-            "filter": [
+            tokenizer: 'kuromoji_tokenizer',
+            filter: [
               'kuromoji_baseform'
             ]
           }
@@ -60,13 +60,11 @@ module Searchable
       must_params = []
       words.each do |word|
         should_params = []
-        should_params << { "terms": { "base_form": [word.base_word], "boost": 2 } }
-        unless word.synonym_words.nil?
-          should_params << { "terms": { "base_form": word.synonym_words } }
-        end
-        must_params << { "bool": { "should": should_params } }
+        should_params << { terms: { base_form: [word.base_word], boost: 2 } }
+        should_params << { terms: { base_form: word.synonym_words } } unless word.synonym_words.nil?
+        must_params << { bool: { should: should_params } }
       end
-      param = { "query": { "bool": { "must": must_params } } }
+      param = { query: { bool: { must: must_params } } }
       __elasticsearch__.search(param)
     end
 
@@ -92,31 +90,31 @@ class MetaFrame < ApplicationRecord
 
   # @return [string]
   def cloud_image_path
-    root_path + '/screenshot/' + id.to_s + '.jpg'
+    "#{root_path}/screenshot/#{image_num}.png"
   end
 
   # @return [string]
   def cloud_gif_path
-    root_path + '/gif/' + id.to_s + '.gif'
+    "#{root_path}/gif/#{image_num}.gif"
   end
 
   # @return [string]
   def image_url
-    'http://' + Settings.bucket_name + '/' + cloud_image_path
+    "http://#{Settings.bucket_name}/#{cloud_image_path}"
   end
 
   # @return [string]
   def gif_url
-    'http://' + Settings.bucket_name + '/' + cloud_gif_path
+    "http://#{Settings.bucket_name}/#{cloud_gif_path}"
   end
 
   # @return [string]
   def root_path
-    movie.season.siry.identifier + '/' + movie.season.serial.to_s + '/' + movie.ep_num.to_s
+    "#{movie.season.siry.identifier}/#{movie.season.serial}/#{movie.ep_num}"
   end
 
   def description_text
-    '[' + movie.season.siry.name + ']' + text
+    "[#{movie.season.siry.name}]#{text}"
   end
 
   # @param local_gif_path [string]

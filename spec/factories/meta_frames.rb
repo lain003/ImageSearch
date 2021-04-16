@@ -6,6 +6,7 @@ FactoryBot.define do
     start_sec { 1 }
     end_sec { 2 }
     text { Faker::Lorem.words }
+    image_num { 1 }
 
     trait :upload_image do
       after(:create) do |meta_frame|
