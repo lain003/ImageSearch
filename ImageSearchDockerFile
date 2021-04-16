@@ -62,7 +62,7 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 RUN apt-get update -qq && apt-get install -y google-chrome-stable
 
 ## webpack
-RUN curl -fsSL https://deb.nodesource.com/setup_13.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_13.x | bash - #node14.9.0以降のバージョンがCircleCI上のDockerに対応していない為
 RUN apt-get --yes --force-yes install nodejs
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
