@@ -35,8 +35,8 @@ RSpec.describe 'MetaFramesIndex', type: :system, elasticsearch: true do
   end
 
   it 'Twitterアイコンを押すと、イメージとGifを共有するボタンが出る' do
-    image_url = "https://twitter.com/share?text=&url=http://127.0.0.1/meta_frames/#{meta_frame_welcome.id.to_s}"
-    gif_url = "https://twitter.com/share?text=&url=http://127.0.0.1/meta_frames/#{meta_frame_welcome.id.to_s}/gif"
+    image_url = "https://twitter.com/share?text=&url=http://127.0.0.1/meta_frames/#{meta_frame_welcome.id}"
+    gif_url = "https://twitter.com/share?text=&url=http://127.0.0.1/meta_frames/#{meta_frame_welcome.id}/gif"
     find('.twitter-icon').click
     aggregate_failures do
       expect(all('ul.type_choice a')[0]['href']).to eq image_url

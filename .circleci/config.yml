@@ -90,6 +90,7 @@ jobs:
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
 
       - setup_remote_docker:
+          version: 19.03.13 # node14.9.0以降のバージョンが、CircleCI上のDockerに対応していない為
           docker_layer_caching: false # 有料プランならtrue
 
       - run:
