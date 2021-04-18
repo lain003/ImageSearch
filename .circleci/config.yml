@@ -146,10 +146,10 @@ workflows:
   version: 2
   test:
     jobs:
-#      - rspec
-      - deploy
-#          requires:
-#            - rspec
-#          filters:
-#            branches:
-#              only: master
+      - rspec
+      - deploy:
+          requires:
+            - rspec
+          filters:
+            branches:
+              only: master

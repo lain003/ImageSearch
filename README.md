@@ -22,6 +22,7 @@
 1. ~~```aws cloudformation create-stack --stack-name security --template-body file://$PWD/vendor/aws/cfn/02-security.yml```~~
 1. ~~```aws cloudformation create-stack --stack-name ecs --template-body file://$PWD/vendor/aws/cfn/03-ecs.yml --parameters ParameterKey=SecretsmanagerArn,ParameterValue=arn:aws:secretsmanager:```~~
 1. コマンドでも出来るはずだが、ブラウザ上でやった方が見やすいし管理しやすい。
+1. CloudFlareのCNAMEレコードをAWSのロードバランサーのDNS名と紐付ける。
 
 # Notes
 - CireciCI上のDockerのセカンダリでkuromojiを入れる方法がわからなかったので、vendor/dockerhubにあるカスタムイメージをDockerHubに手動で上げてそれを使用している
