@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 require 'elasticsearch/model'
-Rails.application.configure do
+Rails.application.configure do # rubocop:disable Metrics/BlockLength
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded on
@@ -53,7 +55,7 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  #Bullet
+  # Bullet
   config.after_initialize do
     Bullet.enable = true
     Bullet.alert = true
@@ -63,4 +65,6 @@ Rails.application.configure do
     Bullet.rails_logger = true
     Bullet.add_footer = true
   end
+
+  config.web_console.whitelisted_ips = '0.0.0.0/0'
 end

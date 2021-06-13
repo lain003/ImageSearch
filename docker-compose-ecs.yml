@@ -9,6 +9,9 @@ services:
       bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production'
     environment:
       - RAILS_LOG_TO_STDOUT=true
+    depends_on:
+      - elastic_search
+      - nginx
   elastic_search:
     image: lain003/release_elastic_search
     container_name: elastic_search
