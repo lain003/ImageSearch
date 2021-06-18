@@ -17,11 +17,9 @@
 
 ## 本番環境構築
 1. 自分のローカルの環境変数にAWS_ACCESS_KEY_IDとAWS_SECRET_ACCESS_KEYをセットする
-1. cfnでawsのインフラをコード化しているので実行する。ecsの引数はverndor/aws/secrets_manager/docker-hub.json.tmpを元に作成したSecretsManagerのarnを指定する。
-1. ~~```aws cloudformation create-stack --stack-name network --template-body file://$PWD/vendor/aws/cfn/01-network.yml```~~
-1. ~~```aws cloudformation create-stack --stack-name security --template-body file://$PWD/vendor/aws/cfn/02-security.yml```~~
-1. ~~```aws cloudformation create-stack --stack-name ecs --template-body file://$PWD/vendor/aws/cfn/03-ecs.yml --parameters ParameterKey=SecretsmanagerArn,ParameterValue=arn:aws:secretsmanager:```~~
-1. コマンドでも出来るはずだが、ブラウザ上でやった方が見やすいし管理しやすい。
+1. vendor/aws/cfn/にCFNがあるので数字順にaws上で実行する。
+1. ecsの引数はverndor/aws/secrets_manager/docker-hub.json.tmpを元に作成したSecretsManagerのarnを指定する。
+1. healthcheckの引数はヘルスチェックが失敗した時にアラームメールを受け取るアドレス。その後Confirmationメールを受け取るのでconfirmする。
 1. CloudFlareのCNAMEレコードをAWSのロードバランサーのDNS名と紐付ける。
 
 # Notes

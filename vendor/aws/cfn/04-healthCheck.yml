@@ -10,7 +10,7 @@ Resources:
         Type: HTTP
         ResourcePath: '/meta_frames/index'
         FullyQualifiedDomainName: imagesearch.biz
-        RequestInterval: 600
+        RequestInterval: 30
         FailureThreshold: 3
 
   Alarm :
@@ -25,7 +25,7 @@ Resources:
             Ref: "Route53HealthCheck"
       ComparisonOperator: "LessThanThreshold"
       Period: 60
-      EvaluationPeriods: 3
+      EvaluationPeriods: 5
       Statistic: "Minimum"
       Threshold: "1.0"
       AlarmActions:
