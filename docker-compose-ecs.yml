@@ -1,17 +1,5 @@
 version: '3'
 services:
-  image_search:
-    image: lain003/release_image_search
-    container_name: image_search
-    ports:
-      - "3000:3000"
-    command: >
-      bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production'
-    environment:
-      - RAILS_LOG_TO_STDOUT=true
-    depends_on:
-      - elastic_search
-      - nginx
   elastic_search:
     image: lain003/release_elastic_search
     container_name: elastic_search
@@ -21,8 +9,28 @@ services:
     environment:
       - cluster.name=develop-cluster
       - discovery.type=single-node
+  image_search:
+    image: lain003/release_image_search
+    container_name: image_search
+    ports:
+      - "3000:3000"
+    command: >
+      bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production'
+    environment:
+      - RAILS_LOG_TO_STDOUT=true
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
+      interval: 1m0s
+      timeout: 10s
+      retries: 3
+      start_period: 2m
+    depends_on:
+      - elastic_search
   nginx:
     image: lain003/release_nginx
     container_name: nginx
     ports:
       - "80:80"
+    depends_on:
+      image_search:
+        condition: service_healthy
