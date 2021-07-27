@@ -85,5 +85,5 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.logger = Logger.new("log/production.log", 3, 10 * 1024 * 1024)
+  config.logger = Logger.new('log/production.log', 3, 10 * 1024 * 1024)
 end
