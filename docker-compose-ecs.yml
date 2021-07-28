@@ -12,8 +12,8 @@ services:
   image_search:
     image: lain003/release_image_search
     container_name: image_search
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     command: >
       bash -c -i 'cd /home/imagesearch && bundle exec rails s -e production'
     environment:
